@@ -16,13 +16,17 @@ import com.csakitheone.wholesomeware_brand.WholesomeWare
 @Composable
 fun WholesomeWareStoreDropdownMenuItem(
     modifier: Modifier = Modifier,
-    text: String = "More apps"
+    text: String = "More apps",
+    onClicked: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
     DropdownMenuItem(
         modifier = modifier,
-        onClick = { WholesomeWare.openPlayStore(context) },
+        onClick = {
+            WholesomeWare.openPlayStore(context)
+            onClicked()
+        },
         leadingIcon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_wholesomeware),

@@ -22,11 +22,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,11 +47,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.csakitheone.wholesomeware.ui.components.Menu
+import com.csakitheone.wholesomeware.ui.components.MenuScope
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware_brand.WholesomeWare
 import com.csakitheone.wholesomeware_brand.ui.components.WholesomeWareStoreButton
@@ -95,53 +102,54 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .zIndex(1f)
                                     .fillMaxWidth()
-                                    .statusBarsPadding()
-                                    .background(MaterialTheme.colorScheme.primary),
+                                    .windowInsetsTopHeight(WindowInsets.statusBars)
+                                    .background(
+                                        Brush.verticalGradient(
+                                            listOf(
+                                                MaterialTheme.colorScheme.primary,
+                                                Color.Transparent
+                                            ),
+                                        )
+                                    ),
                             )
                         }
                     }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    Menu(
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
                     ) {
-                        Text(
-                            text = "An app for everything WholesomeWare related.",
-                        )
-                        HorizontalDivider()
-                        Text(
-                            text = "Live wallpapers",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Card(
-                            onClick = {
-                                setLiveWallpaper(
-                                    ComponentName(
-                                        this@MainActivity,
-                                        KoloraFesztAnalogClockWallpaperService::class.java
+                        title("Live wallpapers")
+                        items(
+                            MenuScope.ItemInfo(
+                                onClick = {
+                                    setLiveWallpaper(
+                                        ComponentName(
+                                            this@MainActivity,
+                                            KoloraFesztAnalogClockWallpaperService::class.java
+                                        )
                                     )
-                                )
-                            },
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(24.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_access_time),
-                                    contentDescription = null,
-                                )
-                                Text("Kolora Feszt analog clock")
-                            }
-                        }
-                        HorizontalDivider()
-                        Text(
-                            text = "Widgets",
-                            style = MaterialTheme.typography.titleMedium,
+                                },
+                                text = "Kolora Feszt analog clock",
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_access_time),
+                                        contentDescription = null,
+                                    )
+                                },
+                            ),
                         )
-                        Text(text = "Coming soon...")
+                        title("Widgets")
+                        items(
+                            MenuScope.ItemInfo(
+                                enabled = false,
+                                text = "Kolora Feszt analog clock",
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_access_time),
+                                        contentDescription = null,
+                                    )
+                                },
+                            ),
+                        )
                     }
                 }
             }

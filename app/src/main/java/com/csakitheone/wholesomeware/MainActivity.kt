@@ -3,54 +3,47 @@ package com.csakitheone.wholesomeware
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.service.wallpaper.WallpaperService
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeFlexibleTopAppBar
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -58,12 +51,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.csakitheone.wholesomeware.ui.components.Menu
 import com.csakitheone.wholesomeware.ui.components.MenuScope
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
-import com.csakitheone.wholesomeware_brand.WholesomeWare
-import com.csakitheone.wholesomeware_brand.ui.components.WholesomeWareStoreButton
-import com.csakitheone.wholesomeware_brand.ui.components.WholesomeWareStoreDropdownMenuItem
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
-import java.util.Timer
-import kotlin.concurrent.timerTask
+import androidx.core.net.toUri
+import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
 
 class MainActivity : ComponentActivity() {
     private var isKeepingSplash = true
@@ -115,9 +105,82 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     Menu(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                            .fillMaxSize()
+                            .padding(16.dp)
+                            .navigationBarsPadding(),
                     ) {
-                        title("Live wallpapers")
+                        Card(shape = WWMenuDefaults.cardFirstItemShape()) {
+                            Text(
+                                modifier = Modifier.padding(16.dp),
+                                text = "“You might not think that programmers are artists, but programming is an extremely creative profession. It’s logic-based creativity.”\n– John Romero",
+                                style = MaterialTheme.typography.bodySmallEmphasized,
+                                fontStyle = FontStyle.Italic,
+                            )
+                        }
+                        WWMenuDefaults.itemsSpacer()
+                        Card(shape = WWMenuDefaults.cardLastItemShape()) {
+                            Text(
+                                modifier = Modifier.padding(16.dp),
+                                text = "A WholesomeWare app alkotások gyűjteménye, amelyeket könnyebb vagy csak mobil alkalmazásban lehet megjeleníteni. Élő hátterek, widget-ek és egyéb apróságok, amelyeket a barátaim, művész ismerősök vagy én készítettem.",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                        title("Linkek")
+                        items(
+                            MenuScope.ItemInfo(
+                                onClick = {
+                                    startActivity(
+                                        Intent(
+                                            Intent.ACTION_VIEW,
+                                            "https://kolora.web.app/".toUri()
+                                        )
+                                    )
+                                },
+                                title = "Kolora Egyesület",
+                                description = "A WholesomeWare nem hivatalos szülő szervezete",
+                                leadingIcon = {
+                                    Icon(
+                                        modifier = Modifier.size(24.dp),
+                                        painter = painterResource(id = R.drawable.ic_kolora),
+                                        contentDescription = null,
+                                    )
+                                },
+                            ),
+                            MenuScope.ItemInfo(
+                                onClick = {
+                                    startActivity(
+                                        Intent(
+                                            Intent.ACTION_VIEW,
+                                            "https://github.com/WholesomeWare".toUri()
+                                        )
+                                    )
+                                },
+                                title = "GitHub",
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_github),
+                                        contentDescription = null,
+                                    )
+                                },
+                                trailingIcon = {
+                                    Button(
+                                        onClick = {
+                                            startActivity(
+                                                Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    "https://github.com/WholesomeWare/WholesomeWare".toUri()
+                                                )
+                                            )
+                                        },
+                                    ) {
+                                        Text(text = "App kódja")
+                                    }
+                                },
+                            ),
+                        )
+                        title("Élő hátterek")
                         items(
                             MenuScope.ItemInfo(
                                 onClick = {
@@ -128,7 +191,8 @@ class MainActivity : ComponentActivity() {
                                         )
                                     )
                                 },
-                                text = "Kolora Feszt analog clock",
+                                title = "Kolora Feszt analóg óra",
+                                description = "Készítette: Csáki",
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_access_time),
@@ -137,11 +201,12 @@ class MainActivity : ComponentActivity() {
                                 },
                             ),
                         )
-                        title("Widgets")
+                        title("Widget-ek")
                         items(
                             MenuScope.ItemInfo(
                                 enabled = false,
-                                text = "Kolora Feszt analog clock",
+                                title = "Kolora Feszt analóg óra",
+                                description = "Hamarosan...",
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_access_time),

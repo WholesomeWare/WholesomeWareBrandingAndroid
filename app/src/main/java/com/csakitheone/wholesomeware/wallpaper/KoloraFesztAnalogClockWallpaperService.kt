@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.service.wallpaper.WallpaperService
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import java.util.Calendar
 import kotlin.math.cos
@@ -17,6 +18,7 @@ import kotlin.math.sin
 import androidx.core.graphics.toColorInt
 import kotlin.apply
 import kotlin.math.PI
+import kotlin.math.max
 
 class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
     override fun onCreateEngine(): Engine {
@@ -29,6 +31,10 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
         private var visible = false
         private var width = 0
         private var height = 0
+        private var isTouching = false
+        private var secondTouchModifier = 1f
+        private var minuteTouchModifier = 1f
+        private var hourTouchModifier = 1f
 
         private fun String.toPaint(): Paint = Paint().apply {
             color = this@toPaint.toColorInt()
@@ -39,9 +45,9 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
         private val drawRunnable = object : Runnable {
             override fun run() {
                 val framerate = if (powerManager.isPowerSaveMode) 1 else 60
-                draw()
+                draw(1000L / framerate)
                 if (visible) {
-                    handler.postDelayed(this, 1000 / framerate.toLong())
+                    handler.postDelayed(this, 1000L / framerate)
                 }
             }
         }
@@ -77,13 +83,21 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
             handler.removeCallbacks(drawRunnable)
         }
 
-        private fun draw() {
+        override fun onTouchEvent(event: MotionEvent?) {
+            when (event?.action) {
+                MotionEvent.ACTION_DOWN -> isTouching = !powerManager.isPowerSaveMode
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> isTouching = false
+            }
+            super.onTouchEvent(event)
+        }
+
+        private fun draw(deltaTime: Long) {
             val holder = surfaceHolder
             var canvas: Canvas? = null
             try {
                 canvas = holder.lockCanvas()
                 if (canvas != null) {
-                    drawClock(canvas)
+                    drawClock(canvas, deltaTime)
                 }
             } finally {
                 if (canvas != null) {
@@ -92,7 +106,7 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
             }
         }
 
-        private fun drawClock(canvas: Canvas) {
+        private fun drawClock(canvas: Canvas, deltaTime: Long) {
             val isDarkMode = (resources.configuration.uiMode and
                     Configuration.UI_MODE_NIGHT_MASK) ==
                     Configuration.UI_MODE_NIGHT_YES
@@ -112,15 +126,25 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
 
             val centerX = width / 2f
             val centerY = height / 2f
-            val secondRadius = min(width, height) * .7f
-            val minuteRadius = min(width, height) * .5f
-            val hourRadius = min(width, height) * .3f
+
+            hourTouchModifier = minuteTouchModifier
+            minuteTouchModifier = secondTouchModifier
+            secondTouchModifier = if (isTouching) {
+                min(1.05f, secondTouchModifier + .0005f * deltaTime)
+            } else {
+                max(1f, secondTouchModifier - .0005f * deltaTime)
+            }
+
+            val secondRadius = min(width, height) * .7f * secondTouchModifier
+            val minuteRadius = min(width, height) * .5f * minuteTouchModifier
+            val hourRadius = min(width, height) * .3f * hourTouchModifier
 
             val calendar = Calendar.getInstance()
             val millisecond = calendar.get(Calendar.MILLISECOND)
             val second = calendar.get(Calendar.SECOND)
             val minute = calendar.get(Calendar.MINUTE)
             val hour = calendar.get(Calendar.HOUR)
+
             val secondRotation =
                 Math.toRadians(second * 6.0 + (millisecond / 1000.0) * 6.0 - 90).toFloat()
             val minuteRotation = Math.toRadians(minute * 6.0 + (second / 60.0) * 6.0 - 90).toFloat()

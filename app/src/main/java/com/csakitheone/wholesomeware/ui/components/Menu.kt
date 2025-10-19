@@ -43,6 +43,9 @@ class WWMenuDefaults {
         fun itemsSpacer() =  Spacer(modifier = Modifier.padding(itemsSpacing))
 
         @Composable
+        fun sectionSpacer() =  Spacer(modifier = Modifier.padding(8.dp))
+
+        @Composable
         fun cardFirstItemShape() = RoundedCornerShape(
             topStart = MaterialTheme.shapes.large.topStart,
             topEnd = MaterialTheme.shapes.large.topEnd,

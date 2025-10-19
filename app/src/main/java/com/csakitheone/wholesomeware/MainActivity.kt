@@ -54,6 +54,7 @@ import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperSe
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
+import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 
 class MainActivity : ComponentActivity() {
     private var isKeepingSplash = true
@@ -123,11 +124,11 @@ class MainActivity : ComponentActivity() {
                         Card(shape = WWMenuDefaults.cardLastItemShape()) {
                             Text(
                                 modifier = Modifier.padding(16.dp),
-                                text = "A WholesomeWare app alkotások gyűjteménye, amelyeket könnyebb vagy csak mobil alkalmazásban lehet megjeleníteni. Élő hátterek, widget-ek és egyéb apróságok, amelyeket a barátaim, művész ismerősök vagy én készítettem.",
+                                text = "A WholesomeWare app olyan alkotások gyűjteménye, amelyeket könnyebb vagy csak mobil alkalmazásban lehet megjeleníteni. Élő hátterek, widget-ek és egyéb apróságok, amelyeket a barátaim, művész ismerősök vagy én készítettem.",
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
-                        title("Linkek")
+                        WWMenuDefaults.sectionSpacer()
                         items(
                             MenuScope.ItemInfo(
                                 onClick = {
@@ -199,6 +200,22 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = null,
                                     )
                                 },
+                            ),
+                            MenuScope.ItemInfo(
+                                onClick = {
+                                    setLiveWallpaper(
+                                        ComponentName(
+                                            this@MainActivity,
+                                            TemplateWallpaperService::class.java
+                                        )
+                                    )
+                                },
+                                title = "Minta élő háttér",
+                                description = "Egy egyszerű példa, ami alapján könnyen lehet új élő hátteret készíteni.",
+                            ),
+                            MenuScope.ItemInfo(
+                                enabled = false,
+                                title = "További hátterek hamarosan...",
                             ),
                         )
                         title("Widget-ek")

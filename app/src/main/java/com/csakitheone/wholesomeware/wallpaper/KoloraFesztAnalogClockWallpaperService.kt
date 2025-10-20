@@ -133,9 +133,9 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
                 hourTouchModifier = minuteTouchModifier
                 minuteTouchModifier = secondTouchModifier
                 secondTouchModifier = if (isTouching) {
-                    min(1.05f, secondTouchModifier + .0005f * deltaTime)
+                    max(.95f, secondTouchModifier - .0005f * deltaTime)
                 } else {
-                    max(1f, secondTouchModifier - .0005f * deltaTime)
+                    min(1f, secondTouchModifier + .0005f * deltaTime)
                 }
 
                 val secondRadius = min(width, height) * .7f * secondTouchModifier

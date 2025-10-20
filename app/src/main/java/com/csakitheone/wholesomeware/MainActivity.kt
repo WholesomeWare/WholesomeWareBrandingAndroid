@@ -27,8 +27,10 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -38,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -53,8 +56,12 @@ import com.csakitheone.wholesomeware.ui.components.MenuScope
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
+import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
+import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private var isKeepingSplash = true
@@ -73,6 +80,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainScreen() {
         WholesomewareBrandTheme {
+            val coroutineScope = rememberCoroutineScope()
+
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background,
@@ -112,7 +121,7 @@ class MainActivity : ComponentActivity() {
                             .padding(16.dp)
                             .navigationBarsPadding(),
                     ) {
-                        Card(shape = WWMenuDefaults.cardFirstItemShape()) {
+                        ElevatedCard(shape = WWMenuDefaults.cardFirstItemShape()) {
                             Text(
                                 modifier = Modifier.padding(16.dp),
                                 text = "“You might not think that programmers are artists, but programming is an extremely creative profession. It’s logic-based creativity.”\n– John Romero",
@@ -121,7 +130,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         WWMenuDefaults.itemsSpacer()
-                        Card(shape = WWMenuDefaults.cardLastItemShape()) {
+                        ElevatedCard(shape = WWMenuDefaults.cardLastItemShape()) {
                             Text(
                                 modifier = Modifier.padding(16.dp),
                                 text = "A WholesomeWare app olyan alkotások gyűjteménye, amelyeket könnyebb vagy csak mobil alkalmazásban lehet megjeleníteni. Élő hátterek, widget-ek és egyéb apróságok, amelyeket a barátaim, művész ismerősök vagy én készítettem.",
@@ -221,14 +230,24 @@ class MainActivity : ComponentActivity() {
                         title("Widget-ek")
                         items(
                             MenuScope.ItemInfo(
-                                enabled = false,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        GlanceAppWidgetManager(this@MainActivity).requestPinGlanceAppWidget(
+                                            receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
+                                            preview = KoloraFesztAnalogClockWidget(),
+                                        )
+                                    }
+                                },
                                 title = "Kolora Feszt analóg óra",
-                                description = "Hamarosan...",
+                                description = "Készítette: Csáki",
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_access_time),
                                         contentDescription = null,
                                     )
+                                },
+                                trailingIcon = {
+                                    Badge { Text(text = "Work in progress") }
                                 },
                             ),
                         )

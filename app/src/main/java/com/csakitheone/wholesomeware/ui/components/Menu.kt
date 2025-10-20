@@ -126,7 +126,9 @@ class MenuScope {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         items[i].leadingIcon?.invoke(this)
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text(text = items[i].title)
                             items[i].description?.let { desc ->
                                 Text(
@@ -136,7 +138,6 @@ class MenuScope {
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.weight(1f))
                         items[i].trailingIcon?.invoke(this)
                     }
                 }

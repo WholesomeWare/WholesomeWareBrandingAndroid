@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -39,12 +40,26 @@ import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,10 +77,9 @@ import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
-    private var isKeepingSplash = true
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
@@ -76,18 +90,54 @@ class MainActivity : ComponentActivity() {
     }
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-    @Preview(device = "spec:parent=pixel_5,orientation=landscape")
     @Composable
     fun MainScreen() {
         WholesomewareBrandTheme {
+            val density = LocalDensity.current
             val coroutineScope = rememberCoroutineScope()
+
+            var smallHeaderAlpha by remember { mutableFloatStateOf(0f) }
+            var headerMinHeight by remember { mutableFloatStateOf(0f) }
+            val headerMaxHeight = remember {
+                val screenWidth = resources.displayMetrics.widthPixels.toFloat()
+                screenWidth * 2305 / 4097
+            }
+            var headerHeight by remember { mutableFloatStateOf(headerMaxHeight) }
+            val menuScrollState = rememberScrollState()
+            val nestedScrollConnection = remember(headerMinHeight) {
+                object : NestedScrollConnection {
+                    override fun onPreScroll(
+                        available: Offset,
+                        source: NestedScrollSource
+                    ): Offset {
+                        val delta = available.y
+
+                        if (delta > 0 && menuScrollState.canScrollBackward) return Offset.Zero
+
+                        val newHeaderHeight = headerHeight + delta
+                        val prevHeaderHeight = headerHeight
+                        headerHeight = newHeaderHeight.coerceIn(headerMinHeight, headerMaxHeight)
+                        val consumed = headerHeight - prevHeaderHeight
+
+                        if (headerMinHeight > 0f) {
+                            smallHeaderAlpha =
+                                1f - (headerHeight - headerMinHeight) / (headerMaxHeight - headerMinHeight)
+                        }
+
+                        return Offset(0f, consumed)
+                    }
+                }
+            }
 
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background,
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.nestedScroll(nestedScrollConnection),
+                ) {
                     Surface(
+                        modifier = Modifier.height(with(density) { headerHeight.toDp() }),
                         shadowElevation = 8.dp,
                     ) {
                         Box(
@@ -97,10 +147,10 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxWidth(),
                                 painter = painterResource(id = R.drawable.wholesomeware_banner),
                                 contentDescription = null,
+                                contentScale = ContentScale.FillWidth,
                             )
                             Box(
                                 modifier = Modifier
-                                    .zIndex(1f)
                                     .fillMaxWidth()
                                     .windowInsetsTopHeight(WindowInsets.statusBars)
                                     .background(
@@ -112,11 +162,23 @@ class MainActivity : ComponentActivity() {
                                         )
                                     ),
                             )
+                            TopAppBar(
+                                modifier = Modifier
+                                    .alpha(smallHeaderAlpha)
+                                    .onGloballyPositioned {
+                                        headerMinHeight = min(it.size.height.toFloat(), headerMaxHeight - 1f)
+                                    },
+                                title = { Text(text = "WholesomeWare") },
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                ),
+                            )
                         }
                     }
                     Menu(
                         modifier = Modifier
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(menuScrollState)
                             .fillMaxSize()
                             .padding(16.dp)
                             .navigationBarsPadding(),

@@ -2,6 +2,7 @@ package com.csakitheone.wholesomeware.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Menu(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     children: @Composable MenuScope.() -> Unit,
 ) {
     val menuScope = remember { MenuScope() }
@@ -30,7 +32,9 @@ fun Menu(
     Column(
         modifier = modifier,
     ) {
-        children(menuScope)
+        Column(modifier = Modifier.padding(contentPadding)) {
+            children(menuScope)
+        }
     }
 }
 
@@ -40,10 +44,10 @@ class WWMenuDefaults {
         val itemsSpacing = 2.dp
 
         @Composable
-        fun itemsSpacer() =  Spacer(modifier = Modifier.padding(itemsSpacing))
+        fun itemsSpacer() = Spacer(modifier = Modifier.padding(itemsSpacing))
 
         @Composable
-        fun sectionSpacer() =  Spacer(modifier = Modifier.padding(8.dp))
+        fun sectionSpacer() = Spacer(modifier = Modifier.padding(8.dp))
 
         @Composable
         fun cardFirstItemShape() = RoundedCornerShape(
@@ -116,6 +120,7 @@ class MenuScope {
                         } else {
                             WWMenuDefaults.cardFirstItemShape()
                         }
+
                         items.size - 1 -> WWMenuDefaults.cardLastItemShape()
                         else -> WWMenuDefaults.cardMiddleItemShape()
                     },

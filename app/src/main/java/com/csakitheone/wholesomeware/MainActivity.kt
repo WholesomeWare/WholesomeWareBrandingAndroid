@@ -10,12 +10,14 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +39,8 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -76,6 +80,7 @@ import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
+import com.csakitheone.wholesomeware_brand.WholesomeWare
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
@@ -89,12 +94,29 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun setLiveWallpaper(wallpaperComponentName: ComponentName) {
+        try {
+            val intent =
+                Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
+            intent.putExtra(
+                WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                wallpaperComponentName
+            )
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(
+                this@MainActivity,
+                "Error setting wallpaper: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
     @Composable
-    fun MainScreen() {
+    private fun MainScreen() {
         WholesomewareBrandTheme {
             val density = LocalDensity.current
-            val coroutineScope = rememberCoroutineScope()
 
             var smallHeaderAlpha by remember { mutableFloatStateOf(0f) }
             var headerMinHeight by remember { mutableFloatStateOf(0f) }
@@ -129,12 +151,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            val TAB_HOME = "home"
+            val TAB_ARTWORKS = "artworks"
+            var selectedTab by remember { mutableStateOf(TAB_HOME) }
+
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background,
             ) {
                 Column(
-                    modifier = Modifier.nestedScroll(nestedScrollConnection),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(nestedScrollConnection),
                 ) {
                     Surface(
                         modifier = Modifier.height(with(density) { headerHeight.toDp() }),
@@ -166,7 +194,8 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .alpha(smallHeaderAlpha)
                                     .onGloballyPositioned {
-                                        headerMinHeight = min(it.size.height.toFloat(), headerMaxHeight - 1f)
+                                        headerMinHeight =
+                                            min(it.size.height.toFloat(), headerMaxHeight - 1f)
                                     },
                                 title = { Text(text = "WholesomeWare") },
                                 colors = TopAppBarDefaults.topAppBarColors(
@@ -176,142 +205,42 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                    Menu(
-                        modifier = Modifier
-                            .verticalScroll(menuScrollState)
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .navigationBarsPadding(),
+                    AnimatedContent(
+                        modifier = Modifier.weight(1f),
+                        targetState = selectedTab,
                     ) {
-                        ElevatedCard(shape = WWMenuDefaults.cardFirstItemShape()) {
-                            Text(
-                                modifier = Modifier.padding(16.dp),
-                                text = "“You might not think that programmers are artists, but programming is an extremely creative profession. It’s logic-based creativity.”\n– John Romero",
-                                style = MaterialTheme.typography.bodySmallEmphasized,
-                                fontStyle = FontStyle.Italic,
+                        when (it) {
+                            TAB_HOME -> TabHome(
+                                modifier = Modifier.verticalScroll(menuScrollState),
+                            )
+
+                            TAB_ARTWORKS -> TabArtworks(
+                                modifier = Modifier.verticalScroll(menuScrollState),
                             )
                         }
-                        WWMenuDefaults.itemsSpacer()
-                        ElevatedCard(shape = WWMenuDefaults.cardLastItemShape()) {
-                            Text(
-                                modifier = Modifier.padding(16.dp),
-                                text = "A WholesomeWare app olyan alkotások gyűjteménye, amelyeket könnyebb vagy csak mobil alkalmazásban lehet megjeleníteni. Élő hátterek, widget-ek és egyéb apróságok, amelyeket a barátaim, művész ismerősök vagy én készítettem.",
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                        WWMenuDefaults.sectionSpacer()
-                        items(
-                            MenuScope.ItemInfo(
-                                onClick = {
-                                    startActivity(
-                                        Intent(
-                                            Intent.ACTION_VIEW,
-                                            "https://kolora.web.app/".toUri()
-                                        )
-                                    )
-                                },
-                                title = "Kolora Egyesület",
-                                description = "A WholesomeWare nem hivatalos szülő szervezete",
-                                leadingIcon = {
-                                    Icon(
-                                        modifier = Modifier.size(24.dp),
-                                        painter = painterResource(id = R.drawable.ic_kolora),
-                                        contentDescription = null,
-                                    )
-                                },
-                            ),
-                            MenuScope.ItemInfo(
-                                onClick = {
-                                    startActivity(
-                                        Intent(
-                                            Intent.ACTION_VIEW,
-                                            "https://github.com/WholesomeWare".toUri()
-                                        )
-                                    )
-                                },
-                                title = "GitHub",
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_github),
-                                        contentDescription = null,
-                                    )
-                                },
-                                trailingIcon = {
-                                    Button(
-                                        onClick = {
-                                            startActivity(
-                                                Intent(
-                                                    Intent.ACTION_VIEW,
-                                                    "https://github.com/WholesomeWare/WholesomeWare".toUri()
-                                                )
-                                            )
-                                        },
-                                    ) {
-                                        Text(text = "App kódja")
-                                    }
-                                },
-                            ),
+                    }
+                    NavigationBar {
+                        NavigationBarItem(
+                            selected = selectedTab == TAB_HOME,
+                            onClick = { selectedTab = TAB_HOME },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_home),
+                                    contentDescription = null,
+                                )
+                            },
+                            label = { Text(text = "Kezdőlap") },
                         )
-                        title("Élő hátterek")
-                        items(
-                            MenuScope.ItemInfo(
-                                onClick = {
-                                    setLiveWallpaper(
-                                        ComponentName(
-                                            this@MainActivity,
-                                            KoloraFesztAnalogClockWallpaperService::class.java
-                                        )
-                                    )
-                                },
-                                title = "Kolora Feszt analóg óra",
-                                description = "Készítette: Csáki",
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_access_time),
-                                        contentDescription = null,
-                                    )
-                                },
-                            ),
-                            MenuScope.ItemInfo(
-                                onClick = {
-                                    setLiveWallpaper(
-                                        ComponentName(
-                                            this@MainActivity,
-                                            TemplateWallpaperService::class.java
-                                        )
-                                    )
-                                },
-                                title = "Minta élő háttér",
-                                description = "Egy egyszerű példa, ami alapján könnyen lehet új élő hátteret készíteni.",
-                            ),
-                            MenuScope.ItemInfo(
-                                enabled = false,
-                                title = "További hátterek hamarosan...",
-                            ),
-                        )
-                        title("Widget-ek")
-                        items(
-                            MenuScope.ItemInfo(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        GlanceAppWidgetManager(this@MainActivity).requestPinGlanceAppWidget(
-                                            receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
-                                            preview = KoloraFesztAnalogClockWidget(),
-                                        )
-                                    }
-                                },
-                                title = "Kolora Feszt analóg óra",
-                                description = "Készítette: Csáki",
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_access_time),
-                                        contentDescription = null,
-                                    )
-                                },
-                                trailingIcon = {
-                                    Badge { Text(text = "Work in progress") }
-                                },
-                            ),
+                        NavigationBarItem(
+                            selected = selectedTab == TAB_ARTWORKS,
+                            onClick = { selectedTab = TAB_ARTWORKS },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_palette),
+                                    contentDescription = null,
+                                )
+                            },
+                            label = { Text(text = "Alkotások") },
                         )
                     }
                 }
@@ -319,21 +248,164 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun setLiveWallpaper(wallpaperComponentName: ComponentName) {
-        try {
-            val intent =
-                Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
-            intent.putExtra(
-                WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                wallpaperComponentName
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @Composable
+    private fun TabHome(
+        modifier: Modifier = Modifier,
+    ) {
+        Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
+            ElevatedCard(shape = WWMenuDefaults.cardFirstItemShape()) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = "“You might not think that programmers are artists, but programming is an extremely creative profession. It’s logic-based creativity.”\n– John Romero",
+                    style = MaterialTheme.typography.bodySmallEmphasized,
+                    fontStyle = FontStyle.Italic,
+                )
+            }
+            WWMenuDefaults.itemsSpacer()
+            ElevatedCard(shape = WWMenuDefaults.cardLastItemShape()) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = "A WholesomeWare app olyan alkotások gyűjteménye, amelyeket könnyebb vagy csak mobil alkalmazásban lehet megjeleníteni. Élő hátterek, widget-ek és egyéb apróságok, amelyeket a barátaim, művész ismerősök vagy én készítettem.",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            WWMenuDefaults.sectionSpacer()
+            items(
+                MenuScope.ItemInfo(
+                    onClick = {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                "https://kolora.web.app/".toUri()
+                            )
+                        )
+                    },
+                    title = "Kolora Egyesület",
+                    description = "A WholesomeWare nem hivatalos szülő szervezete",
+                    leadingIcon = {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            painter = painterResource(id = R.drawable.ic_kolora),
+                            contentDescription = null,
+                        )
+                    },
+                ),
+                MenuScope.ItemInfo(
+                    onClick = {
+                        WholesomeWare.openPlayStore(this@MainActivity)
+                    },
+                    title = "Mégtöbb app tőlünk",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(com.csakitheone.wholesomeware_brand.R.drawable.ic_wholesomeware),
+                            contentDescription = null,
+                        )
+                    },
+                ),
+                MenuScope.ItemInfo(
+                    onClick = {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                "https://github.com/WholesomeWare".toUri()
+                            )
+                        )
+                    },
+                    title = "GitHub",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_github),
+                            contentDescription = null,
+                        )
+                    },
+                    trailingIcon = {
+                        Button(
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        "https://github.com/WholesomeWare/WholesomeWare".toUri()
+                                    )
+                                )
+                            },
+                        ) {
+                            Text(text = "App kódja")
+                        }
+                    },
+                ),
             )
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(
-                this@MainActivity,
-                "Error setting wallpaper: ${e.message}",
-                Toast.LENGTH_SHORT
-            ).show()
+        }
+    }
+
+    @Composable
+    private fun TabArtworks(
+        modifier: Modifier = Modifier,
+    ) {
+        val coroutineScope = rememberCoroutineScope()
+
+        Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
+            title("Élő hátterek")
+            items(
+                MenuScope.ItemInfo(
+                    onClick = {
+                        setLiveWallpaper(
+                            ComponentName(
+                                this@MainActivity,
+                                KoloraFesztAnalogClockWallpaperService::class.java
+                            )
+                        )
+                    },
+                    title = "Kolora Feszt analóg óra",
+                    description = "Készítette: Csáki",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_access_time),
+                            contentDescription = null,
+                        )
+                    },
+                ),
+                MenuScope.ItemInfo(
+                    onClick = {
+                        setLiveWallpaper(
+                            ComponentName(
+                                this@MainActivity,
+                                TemplateWallpaperService::class.java
+                            )
+                        )
+                    },
+                    title = "Minta élő háttér",
+                    description = "Egy egyszerű példa, ami alapján könnyen lehet új élő hátteret készíteni.",
+                ),
+                MenuScope.ItemInfo(
+                    enabled = false,
+                    title = "További hátterek hamarosan...",
+                ),
+            )
+            title("Widget-ek")
+            items(
+                MenuScope.ItemInfo(
+                    onClick = {
+                        coroutineScope.launch {
+                            GlanceAppWidgetManager(this@MainActivity).requestPinGlanceAppWidget(
+                                receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
+                                preview = KoloraFesztAnalogClockWidget(),
+                            )
+                        }
+                    },
+                    title = "Kolora Feszt analóg óra",
+                    description = "Készítette: Csáki",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_access_time),
+                            contentDescription = null,
+                        )
+                    },
+                    trailingIcon = {
+                        Badge { Text(text = "Work in progress") }
+                    },
+                ),
+            )
         }
     }
 }

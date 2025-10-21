@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -82,6 +83,7 @@ class MenuScope {
         val description: String? = null,
         val leadingIcon: @Composable (RowScope.() -> Unit)? = null,
         val trailingIcon: @Composable (RowScope.() -> Unit)? = null,
+        val shapeOverride: Shape? = null,
     )
 
     @Composable
@@ -114,7 +116,7 @@ class MenuScope {
                     modifier = Modifier.fillMaxWidth(),
                     onClick = items[i].onClick,
                     enabled = items[i].enabled,
-                    shape = when (i) {
+                    shape = items[i].shapeOverride ?: when (i) {
                         0 -> if (items.size == 1) {
                             WWMenuDefaults.cardSingleItemShape()
                         } else {

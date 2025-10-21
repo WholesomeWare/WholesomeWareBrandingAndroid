@@ -14,9 +14,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,16 +31,22 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -453,7 +461,7 @@ class MainActivity : ComponentActivity() {
             val url = "https://cloudfront41.lexanetwork.com:7604"
             coroutineScope.launch(Dispatchers.IO) {
                 try {
-                    val text = URL(url).readText(Charsets.ISO_8859_1)
+                    val text = URL(url).readText()
                     radioNowPlaying = text
                         .substringAfter("Current Song:")
                         .substringAfter("streamdata\">")
@@ -466,17 +474,43 @@ class MainActivity : ComponentActivity() {
 
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
             title("Rádió")
-            items(
-                MenuScope.ItemInfo(
-                    onClick = {
-                        refreshRadioMetadata()
-                    },
-                    title = "Vörösmarty Rádió: mi szól most?",
-                    description = radioNowPlaying?.let { "Most szól: $it" }
-                        ?: "Koppints a frissítéshez",
-                    trailingIcon = {
-                        ToggleButton(
-                            enabled = icecastPlayer != null,
+            ElevatedCard(
+                shape = WWMenuDefaults.cardFirstItemShape()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = "Vörösmarty Rádió",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Row {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = radioNowPlaying ?: "A rádió műsora még nem lett lekérve.",
+                        )
+                        IconButton(
+                            onClick = { refreshRadioMetadata() }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_refresh),
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                    Box(
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularWavyProgressIndicator(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .alpha(if (isPlaying) 1f else 0f),
+                        )
+                        ToggleFloatingActionButton(
                             checked = isPlaying,
                             onCheckedChange = { isChecked ->
                                 if (isChecked) {
@@ -496,9 +530,13 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = null,
                             )
                         }
-                    },
-                ),
+                    }
+                }
+            }
+            WWMenuDefaults.itemsSpacer()
+            items(
                 MenuScope.ItemInfo(
+                    shapeOverride = WWMenuDefaults.cardLastItemShape(),
                     enabled = radioNowPlaying != null && radioNowPlaying!!.contains(" - "),
                     onClick = {
                         val artist = radioNowPlaying!!.substringBefore(" - ").trim()

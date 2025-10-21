@@ -9,6 +9,8 @@ coreSplashscreen = "1.0.1"
 uiTextGoogleFonts = "1.9.3"
 material3 = "1.5.0-alpha06"
 glance = "1.2.0-beta01"
+okhttp = "4.12.0"
+media3Exoplayer = "1.8.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +27,8 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 androidx-compose-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
 androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3Exoplayer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

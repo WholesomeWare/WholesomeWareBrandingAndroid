@@ -1,20 +1,19 @@
 package com.csakitheone.wholesomeware
 
+import android.app.SearchManager
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
+import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,8 +21,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -32,25 +29,27 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,9 +65,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.csakitheone.wholesomeware.ui.components.Menu
 import com.csakitheone.wholesomeware.ui.components.MenuScope
@@ -76,12 +73,16 @@ import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperSe
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import com.csakitheone.wholesomeware.experiment.IcecastPlayer
+import com.csakitheone.wholesomeware.experiment.NetworkUtils
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
 import com.csakitheone.wholesomeware_brand.WholesomeWare
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.net.URL
 import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
@@ -153,7 +154,8 @@ class MainActivity : ComponentActivity() {
 
             val TAB_HOME = "home"
             val TAB_ARTWORKS = "artworks"
-            var selectedTab by remember { mutableStateOf(TAB_HOME) }
+            val TAB_EXPERIMENTS = "experiments"
+            var selectedTab by rememberSaveable { mutableStateOf(TAB_HOME) }
 
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -217,6 +219,10 @@ class MainActivity : ComponentActivity() {
                             TAB_ARTWORKS -> TabArtworks(
                                 modifier = Modifier.verticalScroll(menuScrollState),
                             )
+
+                            TAB_EXPERIMENTS -> TabExperiments(
+                                modifier = Modifier.verticalScroll(menuScrollState),
+                            )
                         }
                     }
                     NavigationBar {
@@ -241,6 +247,17 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             label = { Text(text = "Alkotások") },
+                        )
+                        NavigationBarItem(
+                            selected = selectedTab == TAB_EXPERIMENTS,
+                            onClick = { selectedTab = TAB_EXPERIMENTS },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_experiment),
+                                    contentDescription = null,
+                                )
+                            },
+                            label = { Text(text = "Kísérletek") },
                         )
                     }
                 }
@@ -404,6 +421,105 @@ class MainActivity : ComponentActivity() {
                     trailingIcon = {
                         Badge { Text(text = "Work in progress") }
                     },
+                ),
+            )
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @Composable
+    private fun TabExperiments(
+        modifier: Modifier = Modifier,
+    ) {
+        val coroutineScope = rememberCoroutineScope()
+        var icecastPlayer: IcecastPlayer? by remember { mutableStateOf(null) }
+        var isPlaying by remember { mutableStateOf(false) }
+        var radioNowPlaying by remember { mutableStateOf<String?>(null) }
+
+        LaunchedEffect(Unit) {
+            NetworkUtils.disableSSLCertificateVerify()
+        }
+
+        DisposableEffect(Unit) {
+            icecastPlayer = IcecastPlayer(this@MainActivity)
+
+            onDispose {
+                isPlaying = false
+                icecastPlayer?.release()
+            }
+        }
+
+        fun refreshRadioMetadata() {
+            val url = "https://cloudfront41.lexanetwork.com:7604"
+            coroutineScope.launch(Dispatchers.IO) {
+                try {
+                    val text = URL(url).readText(Charsets.ISO_8859_1)
+                    radioNowPlaying = text
+                        .substringAfter("Current Song:")
+                        .substringAfter("streamdata\">")
+                        .substringBefore("<").trim()
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Error fetching radio metadata", e)
+                }
+            }
+        }
+
+        Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
+            title("Rádió")
+            items(
+                MenuScope.ItemInfo(
+                    onClick = {
+                        refreshRadioMetadata()
+                    },
+                    title = "Vörösmarty Rádió: mi szól most?",
+                    description = radioNowPlaying?.let { "Most szól: $it" }
+                        ?: "Koppints a frissítéshez",
+                    trailingIcon = {
+                        ToggleButton(
+                            enabled = icecastPlayer != null,
+                            checked = isPlaying,
+                            onCheckedChange = { isChecked ->
+                                if (isChecked) {
+                                    icecastPlayer?.playStream("https://cloudfront41.lexanetwork.com:7604/livestream.mp3")
+                                    isPlaying = true
+                                    refreshRadioMetadata()
+                                } else {
+                                    icecastPlayer?.stop()
+                                    isPlaying = false
+                                }
+                            },
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
+                                ),
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                ),
+                MenuScope.ItemInfo(
+                    enabled = radioNowPlaying != null && radioNowPlaying!!.contains(" - "),
+                    onClick = {
+                        val artist = radioNowPlaying!!.substringBefore(" - ").trim()
+                        val title = radioNowPlaying!!.substringAfter(" - ").trim()
+
+                        startActivity(
+                            Intent.createChooser(
+                                Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)
+                                    .putExtra(
+                                        MediaStore.EXTRA_MEDIA_FOCUS,
+                                        "vnd.android.cursor.item/audio"
+                                    )
+                                    .putExtra(SearchManager.QUERY, "$artist - $title")
+                                    .putExtra(MediaStore.EXTRA_MEDIA_ARTIST, artist)
+                                    .putExtra(MediaStore.EXTRA_MEDIA_TITLE, title),
+                                "Lejátszás ezzel..."
+                            )
+                        )
+                    },
+                    title = "Intent: keresés és lejátszás",
+                    description = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH,
                 ),
             )
         }

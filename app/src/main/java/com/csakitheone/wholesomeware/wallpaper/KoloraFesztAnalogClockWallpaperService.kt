@@ -28,10 +28,21 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
             private var visible = false
             private var width = 0
             private var height = 0
+            private var centerX = 0f
+            private var centerY = 0f
             private var isTouching = false
+            private var prevTouchX = 0f
+            private var prevTouchY = 0f
+            private var holdingCookie: Int? = null
+            private var secondRadius = 0f
+            private var minuteRadius = 0f
+            private var hourRadius = 0f
             private var secondTouchModifier = 1f
             private var minuteTouchModifier = 1f
             private var hourTouchModifier = 1f
+            private var secondRotation = 0f
+            private var minuteRotation = 0f
+            private var hourRotation = 0f
 
             private fun String.toPaint(): Paint = Paint().apply {
                 color = this@toPaint.toColorInt()
@@ -81,9 +92,43 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
             }
 
             override fun onTouchEvent(event: MotionEvent?) {
+                fun isInside(x: Float, y: Float, radius: Float): Boolean {
+                    return (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY) <= radius * radius
+                }
+
                 when (event?.action) {
-                    MotionEvent.ACTION_DOWN -> isTouching = !powerManager.isPowerSaveMode
-                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> isTouching = false
+                    MotionEvent.ACTION_DOWN -> {
+                        isTouching = !powerManager.isPowerSaveMode
+                        holdingCookie = when {
+                            isInside(event.x, event.y, hourRadius) -> 3
+                            isInside(event.x, event.y, minuteRadius) -> 2
+                            isInside(event.x, event.y, secondRadius) -> 1
+                            else -> null
+                        }
+                        prevTouchX = event.x
+                        prevTouchY = event.y
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        when (holdingCookie) {
+                            3 -> {
+                                hourRotation += (event.x - prevTouchX) / 180
+                            }
+                            2 -> {
+                                minuteRotation += (event.x - prevTouchX) / 180
+                            }
+                            1 -> {
+                                secondRotation += (event.x - prevTouchX) / 180
+                            }
+                        }
+                        prevTouchX = event.x
+                        prevTouchY = event.y
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        isTouching = false
+                        holdingCookie = null
+                    }
                 }
                 super.onTouchEvent(event)
             }
@@ -127,8 +172,8 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
                     backgroundColor.toPaint()
                 )
 
-                val centerX = width / 2f
-                val centerY = height / 2f
+                centerX = width / 2f
+                centerY = height / 2f
 
                 hourTouchModifier = minuteTouchModifier
                 minuteTouchModifier = secondTouchModifier
@@ -138,9 +183,9 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
                     min(1f, secondTouchModifier + .0005f * deltaTime)
                 }
 
-                val secondRadius = min(width, height) * .7f * secondTouchModifier
-                val minuteRadius = min(width, height) * .5f * minuteTouchModifier
-                val hourRadius = min(width, height) * .3f * hourTouchModifier
+                secondRadius = min(width, height) * .7f * secondTouchModifier
+                minuteRadius = min(width, height) * .5f * minuteTouchModifier
+                hourRadius = min(width, height) * .3f * hourTouchModifier
 
                 val calendar = Calendar.getInstance()
                 val millisecond = calendar.get(Calendar.MILLISECOND)
@@ -148,11 +193,12 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
                 val minute = calendar.get(Calendar.MINUTE)
                 val hour = calendar.get(Calendar.HOUR)
 
-                val secondRotation =
+                secondRotation = if (holdingCookie == 1) secondRotation else
                     Math.toRadians(second * 6.0 + (millisecond / 1000.0) * 6.0 - 90).toFloat()
-                val minuteRotation =
+                minuteRotation = if (holdingCookie == 2) minuteRotation else
                     Math.toRadians(minute * 6.0 + (second / 60.0) * 6.0 - 90).toFloat()
-                val hourRotation = Math.toRadians(hour * 30.0 - 90).toFloat()
+                hourRotation = if (holdingCookie == 3) hourRotation else
+                    Math.toRadians(hour * 30.0 - 90).toFloat()
 
                 fun wavyCirclePath(radius: Float, rotation: Float = 0f): Path = Path().apply {
                     moveTo(centerX, centerY - radius)

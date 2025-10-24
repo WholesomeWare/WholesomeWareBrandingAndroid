@@ -18,6 +18,7 @@ import kotlin.math.sin
 import androidx.core.graphics.toColorInt
 import kotlin.apply
 import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.max
 
 class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
@@ -33,6 +34,7 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
             private var isTouching = false
             private var prevTouchX = 0f
             private var prevTouchY = 0f
+            private var prevRadian = 0f
             private var holdingCookie: Int? = null
             private var secondRadius = 0f
             private var minuteRadius = 0f
@@ -105,22 +107,25 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
                             isInside(event.x, event.y, secondRadius) -> 1
                             else -> null
                         }
+                        prevRadian = atan2(event.y - centerY, event.x - centerX)
                         prevTouchX = event.x
                         prevTouchY = event.y
                     }
 
                     MotionEvent.ACTION_MOVE -> {
+                        val currentRadian = atan2(event.y - centerY, event.x - centerX)
                         when (holdingCookie) {
                             3 -> {
-                                hourRotation += (event.x - prevTouchX) / 180
+                                hourRotation += currentRadian - prevRadian
                             }
                             2 -> {
-                                minuteRotation += (event.x - prevTouchX) / 180
+                                minuteRotation += currentRadian - prevRadian
                             }
                             1 -> {
-                                secondRotation += (event.x - prevTouchX) / 180
+                                secondRotation += currentRadian - prevRadian
                             }
                         }
+                        prevRadian = currentRadian
                         prevTouchX = event.x
                         prevTouchY = event.y
                     }
@@ -183,9 +188,9 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
                     min(1f, secondTouchModifier + .0005f * deltaTime)
                 }
 
-                secondRadius = min(width, height) * .7f * secondTouchModifier
-                minuteRadius = min(width, height) * .5f * minuteTouchModifier
-                hourRadius = min(width, height) * .3f * hourTouchModifier
+                secondRadius = min(width, height) * .65f * secondTouchModifier
+                minuteRadius = min(width, height) * .45f * minuteTouchModifier
+                hourRadius = min(width, height) * .25f * hourTouchModifier
 
                 val calendar = Calendar.getInstance()
                 val millisecond = calendar.get(Calendar.MILLISECOND)

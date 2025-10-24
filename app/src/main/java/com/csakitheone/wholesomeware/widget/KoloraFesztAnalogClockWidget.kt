@@ -4,8 +4,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PorterDuff
+import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.appwidget.GlanceAppWidget
@@ -16,9 +20,22 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.text.Text
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.glance.BackgroundModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.appwidget.updateAll
+import androidx.glance.currentState
 import androidx.glance.layout.ContentScale
+import androidx.glance.state.GlanceStateDefinition
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import java.util.Calendar
 import kotlin.math.PI
 import kotlin.math.cos
@@ -26,10 +43,42 @@ import kotlin.math.min
 import kotlin.math.sin
 
 class KoloraFesztAnalogClockWidgetReceiver : GlanceAppWidgetReceiver() {
+    private var isActive = false
+
     override val glanceAppWidget: GlanceAppWidget = KoloraFesztAnalogClockWidget()
+
+    override fun onEnabled(context: Context?) {
+        super.onEnabled(context)
+        isActive = true
+
+        if (context == null) return
+
+        GlobalScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                val ids =
+                    GlanceAppWidgetManager(context).getGlanceIds(KoloraFesztAnalogClockWidget::class.java)
+                ids.forEach { id ->
+                    updateAppWidgetState(context, id) {
+                        it[longPreferencesKey("now")] = System.currentTimeMillis()
+                    }
+                }
+                glanceAppWidget.updateAll(context)
+                delay(1000L)
+            }
+        }
+
+    }
+
+    override fun onDisabled(context: Context?) {
+        isActive = false
+        super.onDisabled(context)
+    }
 }
 
 class KoloraFesztAnalogClockWidget : GlanceAppWidget() {
+    override val stateDefinition: GlanceStateDefinition<*>?
+        get() = super.stateDefinition
+
     override suspend fun provideGlance(
         context: Context,
         id: GlanceId
@@ -37,14 +86,18 @@ class KoloraFesztAnalogClockWidget : GlanceAppWidget() {
         val bitmap = createBitmap(1080, 1080)
         val canvas = Canvas(bitmap)
 
-        drawClock(context, canvas)
-
         provideContent {
+            val now = currentState<Preferences>()[longPreferencesKey("now")]
+
+            LaunchedEffect(now) {
+                drawClock(context, canvas)
+            }
+
             Image(
                 modifier = GlanceModifier.fillMaxSize(),
                 provider = ImageProvider(bitmap),
                 contentScale = ContentScale.Fit,
-                contentDescription = null,
+                contentDescription = now?.toString(),
             )
         }
     }
@@ -99,6 +152,9 @@ class KoloraFesztAnalogClockWidget : GlanceAppWidget() {
             }
             close()
         }
+
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+
 
         canvas.drawPath(
             wavyCirclePath(secondRadius, secondRotation),

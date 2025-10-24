@@ -3,8 +3,11 @@ package com.csakitheone.wholesomeware
 import android.app.SearchManager
 import android.app.WallpaperManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -31,26 +34,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -81,8 +79,8 @@ import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperSe
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import com.csakitheone.wholesomeware.experiment.IcecastPlayer
 import com.csakitheone.wholesomeware.experiment.NetworkUtils
+import com.csakitheone.wholesomeware.service.RadioService
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
@@ -94,12 +92,50 @@ import java.net.URL
 import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
+    private var radioService: RadioService? = null
+    private var isServiceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as RadioService.RadioBinder
+            radioService = binder.getService()
+            isServiceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            radioService = null
+            isServiceBound = false
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         enableEdgeToEdge()
         setContent {
             MainScreen()
+        }
+
+        askNotifyPermission()
+        bindRadioService()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isServiceBound) {
+            unbindService(serviceConnection)
+            isServiceBound = false
+        }
+    }
+
+    private fun bindRadioService() {
+        val intent = Intent(this, RadioService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun askNotifyPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
         }
     }
 
@@ -440,7 +476,6 @@ class MainActivity : ComponentActivity() {
         modifier: Modifier = Modifier,
     ) {
         val coroutineScope = rememberCoroutineScope()
-        var icecastPlayer: IcecastPlayer? by remember { mutableStateOf(null) }
         var isPlaying by remember { mutableStateOf(false) }
         var radioNowPlaying by remember { mutableStateOf<String?>(null) }
 
@@ -448,13 +483,8 @@ class MainActivity : ComponentActivity() {
             NetworkUtils.disableSSLCertificateVerify()
         }
 
-        DisposableEffect(Unit) {
-            icecastPlayer = IcecastPlayer(this@MainActivity)
-
-            onDispose {
-                isPlaying = false
-                icecastPlayer?.release()
-            }
+        LaunchedEffect(radioService) {
+            isPlaying = radioService?.isPlaying() == true
         }
 
         fun refreshRadioMetadata() {
@@ -514,11 +544,20 @@ class MainActivity : ComponentActivity() {
                             checked = isPlaying,
                             onCheckedChange = { isChecked ->
                                 if (isChecked) {
-                                    icecastPlayer?.playStream("https://cloudfront41.lexanetwork.com:7604/livestream.mp3")
+                                    val streamUrl = "https://cloudfront41.lexanetwork.com:7604/livestream.mp3"
+                                    val intent = Intent(this@MainActivity, RadioService::class.java).apply {
+                                        action = RadioService.ACTION_PLAY
+                                        putExtra(RadioService.EXTRA_STREAM_URL, streamUrl)
+                                        putExtra(RadioService.EXTRA_STREAM_TITLE, "Vörösmarty Rádió")
+                                    }
+                                    startService(intent)
                                     isPlaying = true
                                     refreshRadioMetadata()
                                 } else {
-                                    icecastPlayer?.stop()
+                                    val intent = Intent(this@MainActivity, RadioService::class.java).apply {
+                                        action = RadioService.ACTION_PAUSE
+                                    }
+                                    startService(intent)
                                     isPlaying = false
                                 }
                             },

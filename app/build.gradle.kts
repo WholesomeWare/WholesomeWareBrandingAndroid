@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.glance.material3)
     implementation(libs.okhttp)
     implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.session)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

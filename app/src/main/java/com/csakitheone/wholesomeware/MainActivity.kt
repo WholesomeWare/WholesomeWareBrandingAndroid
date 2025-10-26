@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -48,6 +49,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
@@ -276,60 +278,57 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.BottomEnd,
-                ) {
-                    HorizontalFloatingToolbar(
-                        expanded = true,
-                    ) {
-                        ToggleButton(
-                            checked = selectedTab == TAB_HOME,
-                            onCheckedChange = { selectedTab = TAB_HOME },
+                    BottomAppBar {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_home),
-                                contentDescription = null,
-                            )
-                            AnimatedVisibility(visible = selectedTab == TAB_HOME) {
-                                Text(
-                                    modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
-                                    text = "Kezdőlap",
+                            ToggleButton(
+                                checked = selectedTab == TAB_HOME,
+                                onCheckedChange = { selectedTab = TAB_HOME },
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_home),
+                                    contentDescription = null,
                                 )
+                                AnimatedVisibility(visible = selectedTab == TAB_HOME) {
+                                    Text(
+                                        modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
+                                        text = "Kezdőlap",
+                                    )
+                                }
                             }
-                        }
-                        ToggleButton(
-                            checked = selectedTab == TAB_ARTWORKS,
-                            onCheckedChange = { selectedTab = TAB_ARTWORKS },
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_palette),
-                                contentDescription = null,
-                            )
-                            AnimatedVisibility(visible = selectedTab == TAB_ARTWORKS) {
-                                Text(
-                                    modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
-                                    text = "Alkotások",
+                            ToggleButton(
+                                checked = selectedTab == TAB_ARTWORKS,
+                                onCheckedChange = { selectedTab = TAB_ARTWORKS },
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_palette),
+                                    contentDescription = null,
                                 )
+                                AnimatedVisibility(visible = selectedTab == TAB_ARTWORKS) {
+                                    Text(
+                                        modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
+                                        text = "Alkotások",
+                                    )
+                                }
                             }
-                        }
-                        ToggleButton(
-                            checked = selectedTab == TAB_EXPERIMENTS,
-                            onCheckedChange = { selectedTab = TAB_EXPERIMENTS },
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_experiment),
-                                contentDescription = null,
-                            )
-                            AnimatedVisibility(visible = selectedTab == TAB_EXPERIMENTS) {
-                                Text(
-                                    modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
-                                    text = "Kísérletek",
+                            ToggleButton(
+                                checked = selectedTab == TAB_EXPERIMENTS,
+                                onCheckedChange = { selectedTab = TAB_EXPERIMENTS },
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_experiment),
+                                    contentDescription = null,
                                 )
+                                AnimatedVisibility(visible = selectedTab == TAB_EXPERIMENTS) {
+                                    Text(
+                                        modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
+                                        text = "Kísérletek",
+                                    )
+                                }
                             }
                         }
                     }
@@ -410,7 +409,7 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     trailingIcon = {
-                        Button(
+                        OutlinedButton(
                             onClick = {
                                 startActivity(
                                     Intent(
@@ -424,11 +423,6 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                 ),
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(64.dp)
-                    .navigationBarsPadding()
             )
         }
     }
@@ -452,7 +446,6 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     title = "Kolora Feszt analóg óra",
-                    description = "Készítette: Csáki",
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_access_time),
@@ -472,10 +465,6 @@ class MainActivity : ComponentActivity() {
                     title = "Minta élő háttér",
                     description = "Egy egyszerű példa, ami alapján könnyen lehet új élő hátteret készíteni.",
                 ),
-                MenuScope.ItemInfo(
-                    enabled = false,
-                    title = "További hátterek hamarosan...",
-                ),
             )
             title("Widget-ek")
             items(
@@ -489,22 +478,13 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     title = "Kolora Feszt analóg óra",
-                    description = "Készítette: Csáki",
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_access_time),
                             contentDescription = null,
                         )
                     },
-                    trailingIcon = {
-                        Badge { Text(text = "Work in progress") }
-                    },
                 ),
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(64.dp)
-                    .navigationBarsPadding()
             )
         }
     }
@@ -527,6 +507,7 @@ class MainActivity : ComponentActivity() {
         }
 
         fun refreshRadioMetadata() {
+            radioNowPlaying = "Betöltés..."
             val url = "https://cloudfront41.lexanetwork.com:7604"
             coroutineScope.launch(Dispatchers.IO) {
                 try {
@@ -645,11 +626,6 @@ class MainActivity : ComponentActivity() {
                     title = "Intent: keresés és lejátszás (ha zene szól)",
                     description = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH,
                 ),
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(64.dp)
-                    .navigationBarsPadding()
             )
         }
     }

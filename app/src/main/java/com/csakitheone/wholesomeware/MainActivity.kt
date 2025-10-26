@@ -15,6 +15,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,10 +23,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -38,6 +41,7 @@ import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +49,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -269,40 +274,53 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                    NavigationBar {
-                        NavigationBarItem(
-                            selected = selectedTab == TAB_HOME,
-                            onClick = { selectedTab = TAB_HOME },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_home),
-                                    contentDescription = null,
-                                )
-                            },
-                            label = { Text(text = "Kezdőlap") },
-                        )
-                        NavigationBarItem(
-                            selected = selectedTab == TAB_ARTWORKS,
-                            onClick = { selectedTab = TAB_ARTWORKS },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_palette),
-                                    contentDescription = null,
-                                )
-                            },
-                            label = { Text(text = "Alkotások") },
-                        )
-                        NavigationBarItem(
-                            selected = selectedTab == TAB_EXPERIMENTS,
-                            onClick = { selectedTab = TAB_EXPERIMENTS },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_experiment),
-                                    contentDescription = null,
-                                )
-                            },
-                            label = { Text(text = "Kísérletek") },
-                        )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.BottomEnd,
+                ) {
+                    HorizontalFloatingToolbar(
+                        expanded = true,
+                    ) {
+                        ToggleButton(
+                            checked = selectedTab == TAB_HOME,
+                            onCheckedChange = { selectedTab = TAB_HOME },
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_home),
+                                contentDescription = null,
+                            )
+                            AnimatedVisibility(visible = selectedTab == TAB_HOME) {
+                                Text(text = "Kezdőlap")
+                            }
+                        }
+                        ToggleButton(
+                            checked = selectedTab == TAB_ARTWORKS,
+                            onCheckedChange = { selectedTab = TAB_ARTWORKS },
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_palette),
+                                contentDescription = null,
+                            )
+                            AnimatedVisibility(visible = selectedTab == TAB_ARTWORKS) {
+                                Text(text = "Alkotások")
+                            }
+                        }
+                        ToggleButton(
+                            checked = selectedTab == TAB_EXPERIMENTS,
+                            onCheckedChange = { selectedTab = TAB_EXPERIMENTS },
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_experiment),
+                                contentDescription = null,
+                            )
+                            AnimatedVisibility(visible = selectedTab == TAB_EXPERIMENTS) {
+                                Text(text = "Kísérletek")
+                            }
+                        }
                     }
                 }
             }
@@ -396,6 +414,11 @@ class MainActivity : ComponentActivity() {
                     },
                 ),
             )
+            Spacer(
+                modifier = Modifier
+                    .height(64.dp)
+                    .navigationBarsPadding()
+            )
         }
     }
 
@@ -466,6 +489,11 @@ class MainActivity : ComponentActivity() {
                         Badge { Text(text = "Work in progress") }
                     },
                 ),
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(64.dp)
+                    .navigationBarsPadding()
             )
         }
     }
@@ -544,19 +572,25 @@ class MainActivity : ComponentActivity() {
                             checked = isPlaying,
                             onCheckedChange = { isChecked ->
                                 if (isChecked) {
-                                    val streamUrl = "https://cloudfront41.lexanetwork.com:7604/livestream.mp3"
-                                    val intent = Intent(this@MainActivity, RadioService::class.java).apply {
-                                        action = RadioService.ACTION_PLAY
-                                        putExtra(RadioService.EXTRA_STREAM_URL, streamUrl)
-                                        putExtra(RadioService.EXTRA_STREAM_TITLE, "Vörösmarty Rádió")
-                                    }
+                                    val streamUrl =
+                                        "https://cloudfront41.lexanetwork.com:7604/livestream.mp3"
+                                    val intent =
+                                        Intent(this@MainActivity, RadioService::class.java).apply {
+                                            action = RadioService.ACTION_PLAY
+                                            putExtra(RadioService.EXTRA_STREAM_URL, streamUrl)
+                                            putExtra(
+                                                RadioService.EXTRA_STREAM_TITLE,
+                                                "Vörösmarty Rádió"
+                                            )
+                                        }
                                     startService(intent)
                                     isPlaying = true
                                     refreshRadioMetadata()
                                 } else {
-                                    val intent = Intent(this@MainActivity, RadioService::class.java).apply {
-                                        action = RadioService.ACTION_PAUSE
-                                    }
+                                    val intent =
+                                        Intent(this@MainActivity, RadioService::class.java).apply {
+                                            action = RadioService.ACTION_PAUSE
+                                        }
                                     startService(intent)
                                     isPlaying = false
                                 }
@@ -598,6 +632,11 @@ class MainActivity : ComponentActivity() {
                     title = "Intent: keresés és lejátszás",
                     description = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH,
                 ),
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(64.dp)
+                    .navigationBarsPadding()
             )
         }
     }

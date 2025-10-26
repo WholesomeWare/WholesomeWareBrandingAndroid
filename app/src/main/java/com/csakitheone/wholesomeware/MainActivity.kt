@@ -51,6 +51,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -519,7 +520,8 @@ class MainActivity : ComponentActivity() {
             val url = "https://cloudfront41.lexanetwork.com:7604"
             coroutineScope.launch(Dispatchers.IO) {
                 try {
-                    val text = URL(url).readText()
+                    val text =
+                        String(URL(url).readText().toByteArray(Charsets.ISO_8859_1), Charsets.UTF_8)
                     radioNowPlaying = text
                         .substringAfter("Current Song:")
                         .substringAfter("streamdata\">")
@@ -601,6 +603,7 @@ class MainActivity : ComponentActivity() {
                                     if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
                                 ),
                                 contentDescription = null,
+                                tint = ToggleFloatingActionButtonDefaults.iconColor()(if (isPlaying) 1f else 0f),
                             )
                         }
                     }
@@ -629,7 +632,7 @@ class MainActivity : ComponentActivity() {
                             )
                         )
                     },
-                    title = "Intent: keresés és lejátszás",
+                    title = "Intent: keresés és lejátszás (ha zene szól)",
                     description = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH,
                 ),
             )

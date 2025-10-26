@@ -37,6 +37,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -295,7 +296,10 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = null,
                             )
                             AnimatedVisibility(visible = selectedTab == TAB_HOME) {
-                                Text(text = "Kezdőlap")
+                                Text(
+                                    modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
+                                    text = "Kezdőlap",
+                                )
                             }
                         }
                         ToggleButton(
@@ -307,7 +311,10 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = null,
                             )
                             AnimatedVisibility(visible = selectedTab == TAB_ARTWORKS) {
-                                Text(text = "Alkotások")
+                                Text(
+                                    modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
+                                    text = "Alkotások",
+                                )
                             }
                         }
                         ToggleButton(
@@ -319,7 +326,10 @@ class MainActivity : ComponentActivity() {
                                 contentDescription = null,
                             )
                             AnimatedVisibility(visible = selectedTab == TAB_EXPERIMENTS) {
-                                Text(text = "Kísérletek")
+                                Text(
+                                    modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
+                                    text = "Kísérletek",
+                                )
                             }
                         }
                     }

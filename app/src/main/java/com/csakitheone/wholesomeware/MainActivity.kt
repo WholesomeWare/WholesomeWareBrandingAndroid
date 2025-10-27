@@ -43,13 +43,19 @@ import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FlexibleBottomAppBar
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationItemIconPosition
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
+import androidx.compose.material3.ShortNavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
@@ -78,8 +84,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.csakitheone.wholesomeware.ui.components.Menu
@@ -168,8 +176,10 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
     @Composable
+    @Preview
     private fun MainScreen() {
         WholesomewareBrandTheme {
+            val resources = LocalResources.current
             val density = LocalDensity.current
 
             var smallHeaderAlpha by remember { mutableFloatStateOf(0f) }
@@ -278,58 +288,61 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                    BottomAppBar {
+                    FlexibleBottomAppBar {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            ToggleButton(
-                                checked = selectedTab == TAB_HOME,
-                                onCheckedChange = { selectedTab = TAB_HOME },
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_home),
-                                    contentDescription = null,
-                                )
-                                AnimatedVisibility(visible = selectedTab == TAB_HOME) {
-                                    Text(
-                                        modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
-                                        text = "Kezdőlap",
+                            ShortNavigationBarItem(
+                                iconPosition = NavigationItemIconPosition.Start,
+                                selected = selectedTab == TAB_HOME,
+                                onClick = { selectedTab = TAB_HOME },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_home),
+                                        contentDescription = null,
                                     )
-                                }
-                            }
-                            ToggleButton(
-                                checked = selectedTab == TAB_ARTWORKS,
-                                onCheckedChange = { selectedTab = TAB_ARTWORKS },
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_palette),
-                                    contentDescription = null,
-                                )
-                                AnimatedVisibility(visible = selectedTab == TAB_ARTWORKS) {
-                                    Text(
-                                        modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
-                                        text = "Alkotások",
+                                },
+                                label = {
+                                    AnimatedVisibility(visible = selectedTab == TAB_HOME) {
+                                        Text(text = "Kezdőlap")
+                                    }
+                                },
+                            )
+                            ShortNavigationBarItem(
+                                iconPosition = NavigationItemIconPosition.Start,
+                                selected = selectedTab == TAB_ARTWORKS,
+                                onClick = { selectedTab = TAB_ARTWORKS },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_palette),
+                                        contentDescription = null,
                                     )
-                                }
-                            }
-                            ToggleButton(
-                                checked = selectedTab == TAB_EXPERIMENTS,
-                                onCheckedChange = { selectedTab = TAB_EXPERIMENTS },
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_experiment),
-                                    contentDescription = null,
-                                )
-                                AnimatedVisibility(visible = selectedTab == TAB_EXPERIMENTS) {
-                                    Text(
-                                        modifier = Modifier.padding(start = ButtonDefaults.IconSpacing),
-                                        text = "Kísérletek",
+                                },
+                                label = {
+                                    AnimatedVisibility(visible = selectedTab == TAB_ARTWORKS) {
+                                        Text(text = "Alkotások")
+                                    }
+                                },
+                            )
+                            ShortNavigationBarItem(
+                                iconPosition = NavigationItemIconPosition.Start,
+                                selected = selectedTab == TAB_EXPERIMENTS,
+                                onClick = { selectedTab = TAB_EXPERIMENTS },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_experiment),
+                                        contentDescription = null,
                                     )
-                                }
-                            }
+                                },
+                                label = {
+                                    AnimatedVisibility(visible = selectedTab == TAB_EXPERIMENTS) {
+                                        Text(text = "Kísérletek")
+                                    }
+                                },
+                            )
                         }
                     }
                 }

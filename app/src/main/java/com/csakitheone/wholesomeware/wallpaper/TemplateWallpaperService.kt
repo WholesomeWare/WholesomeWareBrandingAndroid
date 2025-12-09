@@ -1,5 +1,7 @@
 package com.csakitheone.wholesomeware.wallpaper
 
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -40,6 +42,21 @@ class TemplateWallpaperService : WallpaperService() {
                 color = this@toPaint.toColorInt()
                 style = Paint.Style.FILL
                 isAntiAlias = true
+            }
+
+            // Example: Battery percentage retrieval
+            private fun getBatteryPercentage(): Int {
+                val batteryStatus = registerReceiver(
+                    null,
+                    IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+                )
+                val level = batteryStatus?.getIntExtra("level", -1) ?: -1
+                val scale = batteryStatus?.getIntExtra("scale", -1) ?: -1
+                return if (level != -1 && scale != -1) {
+                    (level * 100) / scale
+                } else {
+                    -1
+                }
             }
 
             private val drawRunnable = object : Runnable {
@@ -143,8 +160,9 @@ class TemplateWallpaperService : WallpaperService() {
                     textSize = 50f
                     isAntiAlias = true
                 }
-                canvas.drawText("Theme: ${if (isDarkMode) "Dark" else "Light"}", 50f, height / 2f, textPaint)
-                canvas.drawText("Touching: $isTouching", 50f, height / 2f + 200f, textPaint)
+                canvas.drawText("Theme: ${if (isDarkMode) "Dark" else "Light"}", 50f, height / 2f - 200f, textPaint)
+                canvas.drawText("Touching: $isTouching", 50f, height / 2f, textPaint)
+                canvas.drawText("Battery percentage: ${getBatteryPercentage()}%", 50f, height / 2f + 200f, textPaint)
             }
         }
     }

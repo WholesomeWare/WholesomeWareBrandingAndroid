@@ -112,6 +112,10 @@ class MainActivity : ComponentActivity() {
     private var radioService: RadioService? = null
     private var isServiceBound = false
 
+    private val TAB_HOME = "home"
+    private val TAB_ARTWORKS = "artworks"
+    private val TAB_EXPERIMENTS = "experiments"
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as RadioService.RadioBinder
@@ -215,9 +219,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            val TAB_HOME = "home"
-            val TAB_ARTWORKS = "artworks"
-            val TAB_EXPERIMENTS = "experiments"
             var selectedTab by rememberSaveable { mutableStateOf(TAB_HOME) }
 
             Surface(
@@ -277,6 +278,7 @@ class MainActivity : ComponentActivity() {
                         when (it) {
                             TAB_HOME -> TabHome(
                                 modifier = Modifier.verticalScroll(menuScrollState),
+                                onTabChangeRequest = { tab -> selectedTab = tab }
                             )
 
                             TAB_ARTWORKS -> TabArtworks(
@@ -354,6 +356,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun TabHome(
         modifier: Modifier = Modifier,
+        onTabChangeRequest: (String) -> Unit = { _ -> },
     ) {
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
             ElevatedCard(shape = WWMenuDefaults.cardFirstItemShape()) {
@@ -372,6 +375,30 @@ class MainActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+            WWMenuDefaults.sectionSpacer()
+            items(
+                MenuScope.ItemInfo(
+                    onClick = { onTabChangeRequest(TAB_ARTWORKS) },
+                    title = "Alkotások",
+                    description = "Élő hátterek és widget-ek gyűjteménye",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_palette),
+                            contentDescription = null,
+                        )
+                    },
+                ),
+                MenuScope.ItemInfo(
+                    onClick = { onTabChangeRequest(TAB_EXPERIMENTS) },
+                    title = "Kísérletek",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_experiment),
+                            contentDescription = null,
+                        )
+                    },
+                ),
+            )
             WWMenuDefaults.sectionSpacer()
             items(
                 MenuScope.ItemInfo(

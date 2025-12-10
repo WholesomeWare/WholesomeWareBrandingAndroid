@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -137,11 +138,13 @@ class MenuScope {
                             modifier = Modifier.weight(1f),
                         ) {
                             Text(text = items[i].title)
-                            items[i].description?.let { desc ->
+                            if (!items[i].description.isNullOrBlank()) {
                                 Text(
                                     modifier = Modifier.alpha(.6f),
-                                    text = desc,
+                                    text = items[i].description ?: "",
                                     style = MaterialTheme.typography.labelSmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
                                 )
                             }
                         }

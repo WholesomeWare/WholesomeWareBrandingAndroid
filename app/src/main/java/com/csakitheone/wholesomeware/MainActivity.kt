@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -58,6 +59,7 @@ import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.ShortNavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults
@@ -83,6 +85,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
@@ -97,6 +100,10 @@ import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import com.csakitheone.wholesomeware.experiment.NetworkUtils
+import com.csakitheone.wholesomeware.model.Artwork
+import com.csakitheone.wholesomeware.model.WallpaperArtwork
+import com.csakitheone.wholesomeware.model.WidgetArtwork
+import com.csakitheone.wholesomeware.model.getArtworks
 import com.csakitheone.wholesomeware.service.RadioService
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
@@ -359,20 +366,12 @@ class MainActivity : ComponentActivity() {
         onTabChangeRequest: (String) -> Unit = { _ -> },
     ) {
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
-            ElevatedCard(shape = WWMenuDefaults.cardFirstItemShape()) {
+            ElevatedCard(shape = WWMenuDefaults.cardSingleItemShape()) {
                 Text(
                     modifier = Modifier.padding(16.dp),
                     text = "“You might not think that programmers are artists, but programming is an extremely creative profession. It’s logic-based creativity.”\n– John Romero",
                     style = MaterialTheme.typography.bodySmallEmphasized,
                     fontStyle = FontStyle.Italic,
-                )
-            }
-            WWMenuDefaults.itemsSpacer()
-            ElevatedCard(shape = WWMenuDefaults.cardLastItemShape()) {
-                Text(
-                    modifier = Modifier.padding(16.dp),
-                    text = "A WholesomeWare app olyan alkotások gyűjteménye, amelyeket könnyebb vagy csak mobil alkalmazásban lehet megjeleníteni. Élő hátterek, widget-ek és egyéb apróságok, amelyeket a barátaim, művész ismerősök vagy én készítettem.",
-                    style = MaterialTheme.typography.bodySmall,
                 )
             }
             WWMenuDefaults.sectionSpacer()
@@ -471,60 +470,77 @@ class MainActivity : ComponentActivity() {
     private fun TabArtworks(
         modifier: Modifier = Modifier,
     ) {
-        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
+        val artworks = remember { getArtworks(context) }
+
+        var selectedArtwork by remember { mutableStateOf<Artwork?>(null) }
+
+        if (selectedArtwork != null) {
+            AlertDialog(
+                onDismissRequest = { selectedArtwork = null },
+                title = { Text(text = selectedArtwork!!.title) },
+                text = {
+                    Column {
+                        Text(text = "Készítő: ${selectedArtwork!!.author}")
+                        if (selectedArtwork!!.description.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = selectedArtwork!!.description,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { selectedArtwork = null }
+                    ) {
+                        Text(text = "Bezárás")
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            selectedArtwork!!.let { artwork ->
+                                when (artwork) {
+                                    is WallpaperArtwork -> {
+                                        artwork.set(context)
+                                    }
+
+                                    is WidgetArtwork<*> -> {
+                                        artwork.set(context)
+                                    }
+                                }
+                            }
+                            selectedArtwork = null
+                        }
+                    ) {
+                        Text(text = "Beállítás")
+                    }
+                }
+            )
+        }
 
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
             title("Élő hátterek")
             items(
-                MenuScope.ItemInfo(
-                    onClick = {
-                        setLiveWallpaper(
-                            ComponentName(
-                                this@MainActivity,
-                                KoloraFesztAnalogClockWallpaperService::class.java
-                            )
-                        )
-                    },
-                    title = "Kolora Feszt analóg óra",
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_access_time),
-                            contentDescription = null,
-                        )
-                    },
-                ),
-                MenuScope.ItemInfo(
-                    onClick = {
-                        setLiveWallpaper(
-                            ComponentName(
-                                this@MainActivity,
-                                TemplateWallpaperService::class.java
-                            )
-                        )
-                    },
-                    title = "Minta élő háttér",
-                    description = "Egy egyszerű példa, ami alapján könnyen lehet új élő hátteret készíteni.",
-                ),
+                artworks.filter { it is WallpaperArtwork }.map { artwork ->
+                    MenuScope.ItemInfo(
+                        onClick = { selectedArtwork = artwork },
+                        title = artwork.title,
+                        description = artwork.description,
+                    )
+                }
             )
             title("Widget-ek")
             items(
-                MenuScope.ItemInfo(
-                    onClick = {
-                        coroutineScope.launch {
-                            GlanceAppWidgetManager(this@MainActivity).requestPinGlanceAppWidget(
-                                receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
-                                preview = KoloraFesztAnalogClockWidget(),
-                            )
-                        }
-                    },
-                    title = "Kolora Feszt analóg óra",
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_access_time),
-                            contentDescription = null,
-                        )
-                    },
-                ),
+                artworks.filter { it is WidgetArtwork<*> }.map { artwork ->
+                    MenuScope.ItemInfo(
+                        onClick = { selectedArtwork = artwork },
+                        title = artwork.title,
+                        description = artwork.description,
+                    )
+                }
             )
         }
     }

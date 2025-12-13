@@ -526,9 +526,21 @@ class MainActivity : ComponentActivity() {
             items(
                 artworks.filter { it is WallpaperArtwork }.map { artwork ->
                     MenuScope.ItemInfo(
-                        onClick = { selectedArtwork = artwork },
+                        onClick = {
+                            (artwork as WallpaperArtwork).set(context)
+                        },
                         title = artwork.title,
-                        description = artwork.description,
+                        description = "by ${artwork.author} - ${artwork.description}",
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { selectedArtwork = artwork }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_info),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
                     )
                 }
             )
@@ -536,9 +548,21 @@ class MainActivity : ComponentActivity() {
             items(
                 artworks.filter { it is WidgetArtwork<*> }.map { artwork ->
                     MenuScope.ItemInfo(
-                        onClick = { selectedArtwork = artwork },
+                        onClick = {
+                            (artwork as WidgetArtwork<*>).set(context)
+                        },
                         title = artwork.title,
-                        description = artwork.description,
+                        description = "by ${artwork.author} - ${artwork.description}",
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { selectedArtwork = artwork }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_info),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
                     )
                 }
             )

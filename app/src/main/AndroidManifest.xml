@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
@@ -28,20 +29,6 @@
         </activity>
 
         <service
-            android:name=".wallpaper.TemplateWallpaperService"
-            android:enabled="true"
-            android:exported="true"
-            android:label="@string/template_wallpaper_name"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.service.wallpaper"
-                android:resource="@xml/template_wallpaper" />
-        </service>
-        <service
             android:name=".wallpaper.KoloraFesztAnalogClockWallpaperService"
             android:enabled="true"
             android:exported="true"
@@ -54,6 +41,34 @@
             <meta-data
                 android:name="android.service.wallpaper"
                 android:resource="@xml/kolora_feszt_analog_clock_wallpaper" />
+        </service>
+        <service
+            android:name=".wallpaper.D20WallpaperService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/d20_wallpaper_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/d20_wallpaper" />
+        </service>
+        <service
+            android:name=".wallpaper.TemplateWallpaperService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/template_wallpaper_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/template_wallpaper" />
         </service>
 
         <receiver

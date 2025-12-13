@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
@@ -72,6 +73,15 @@ fun getArtworks(context: Context): List<Artwork> {
             componentName = ComponentName(
                 context,
                 KoloraFesztAnalogClockWallpaperService::class.java
+            ),
+        ),
+        WallpaperArtwork(
+            title = "D20",
+            author = "Csáki",
+            description = "Koppints duplán a kocka megforgatásához!",
+            componentName = ComponentName(
+                context,
+                D20WallpaperService::class.java
             ),
         ),
         WallpaperArtwork(

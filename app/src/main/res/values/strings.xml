@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">WholesomeWare</string>
 
-    <string name="template_wallpaper_name">Template wallpaper</string>
-    <string name="template_wallpaper_description">A wallpaper to make creating new wallpapers easier.</string>
-
     <string name="kolora_feszt_analog_clock_wallpaper_name">Kolora Feszt analog clock</string>
     <string name="kolora_feszt_analog_clock_wallpaper_description">An analog clock wallpaper based on the poster of the first Kolora Feszt event.</string>
+
+    <string name="d20_wallpaper_name">D20 wallpaper</string>
+    <string name="d20_wallpaper_description">A wallpaper featuring a D20 die.</string>
+
+    <string name="template_wallpaper_name">Template wallpaper</string>
+    <string name="template_wallpaper_description">A wallpaper to make creating new wallpapers easier.</string>
 </resources>

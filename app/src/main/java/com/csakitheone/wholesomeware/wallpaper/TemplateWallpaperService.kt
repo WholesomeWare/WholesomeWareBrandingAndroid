@@ -1,17 +1,21 @@
 package com.csakitheone.wholesomeware.wallpaper
 
+import android.app.WallpaperColors
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.service.wallpaper.WallpaperService
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import androidx.annotation.RequiresApi
 import java.util.Calendar
 import kotlin.math.cos
 import kotlin.math.min
@@ -97,6 +101,26 @@ class TemplateWallpaperService : WallpaperService() {
                 this.width = width
                 this.height = height
                 super.onSurfaceChanged(holder, format, width, height)
+                // Notify system about color changes for Material You theming
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    notifyColorsChanged()
+                }
+            }
+
+            @RequiresApi(Build.VERSION_CODES.O_MR1)
+            override fun onComputeColors(): WallpaperColors {
+                val isDarkMode = (resources.configuration.uiMode and
+                        Configuration.UI_MODE_NIGHT_MASK) ==
+                        Configuration.UI_MODE_NIGHT_YES
+
+                val backgroundColor = if (isDarkMode) "#121212" else "#808080"
+                val foregroundColor = if (isDarkMode) "#808080" else "#121212"
+
+                return WallpaperColors(
+                    Color.valueOf(backgroundColor.toColorInt()),
+                    Color.valueOf(foregroundColor.toColorInt()),
+                    null
+                )
             }
 
             override fun onSurfaceDestroyed(holder: SurfaceHolder?) {

@@ -9,6 +9,7 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
+import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
@@ -20,12 +21,16 @@ interface Artwork {
     val title: String
     val author: String
     val description: String
+    val unlockDescription: String
+    val unlockData: String
 }
 
 data class WallpaperArtwork(
     override val title: String,
     override val author: String,
     override val description: String = "",
+    override val unlockDescription: String = "",
+    override val unlockData: String = "",
     val componentName: ComponentName,
 ) : Artwork {
     fun set(context: Context) {
@@ -51,6 +56,8 @@ data class WidgetArtwork<T>(
     override val title: String,
     override val author: String,
     override val description: String = "",
+    override val unlockDescription: String = "",
+    override val unlockData: String = "",
     val receiver: Class<T>,
     val widget: GlanceAppWidget,
 ): Artwork {
@@ -67,15 +74,6 @@ data class WidgetArtwork<T>(
 fun getArtworks(context: Context): List<Artwork> {
     return listOf(
         WallpaperArtwork(
-            title = "Kolora Feszt óra",
-            author = "Csáki",
-            description = "Analóg óra a 2025-ös Kolora Feszt plakátja stílusában.",
-            componentName = ComponentName(
-                context,
-                KoloraFesztAnalogClockWallpaperService::class.java
-            ),
-        ),
-        WallpaperArtwork(
             title = "D20",
             author = "Csáki",
             description = "Koppints duplán a kocka megforgatásához!",
@@ -85,12 +83,23 @@ fun getArtworks(context: Context): List<Artwork> {
             ),
         ),
         WallpaperArtwork(
-            title = "Minta háttér",
+            title = "Kolora Feszt óra",
             author = "Csáki",
-            description = "Egy egyszerű példa, ami alapján könnyen lehet új élő hátteret készíteni.",
+            description = "Analóg óra a 2025-ös Kolora Feszt plakátja stílusában.",
             componentName = ComponentName(
                 context,
-                TemplateWallpaperService::class.java
+                KoloraFesztAnalogClockWallpaperService::class.java
+            ),
+        ),
+        WallpaperArtwork(
+            title = "szabad repülés - szabad merülés",
+            author = "Helka",
+            description = "Helka két kislemez borítójából készült grafika.",
+            unlockDescription = "Feloldáshoz látogasd meg Helka weboldalát.",
+            unlockData = "https://www.helkamusic.hu/",
+            componentName = ComponentName(
+                context,
+                HelkaFreeFlightDiveService::class.java
             ),
         ),
         WidgetArtwork(

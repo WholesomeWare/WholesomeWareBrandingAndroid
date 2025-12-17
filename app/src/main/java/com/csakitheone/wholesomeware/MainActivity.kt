@@ -54,6 +54,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationItemIconPosition
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.ShortNavigationBarItemDefaults
@@ -67,6 +68,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -474,6 +476,12 @@ class MainActivity : ComponentActivity() {
         val artworks = remember { getArtworks(context) }
 
         var selectedArtwork by remember { mutableStateOf<Artwork?>(null) }
+        val isSelectedArtworkUnlocked by remember {
+            derivedStateOf {
+                if (selectedArtwork == null) return@derivedStateOf false
+                UserSettings.isArtworkUnlocked(context, selectedArtwork!!.unlockData)
+            }
+        }
 
         if (selectedArtwork != null) {
             AlertDialog(
@@ -489,6 +497,44 @@ class MainActivity : ComponentActivity() {
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
+                        if (!isSelectedArtworkUnlocked) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedCard {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_lock),
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.size(8.dp))
+                                    Text(text = selectedArtwork!!.unlockDescription)
+                                }
+                            }
+                        }
+                        else if (!selectedArtwork?.unlockData.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedButton(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    UserSettings.lockArtwork(
+                                        context,
+                                        selectedArtwork!!.unlockData
+                                    )
+                                    selectedArtwork = null
+                                }
+                            ) {
+                                Icon(
+                                    modifier = Modifier.padding(end = ButtonDefaults.IconSpacing),
+                                    painter = painterResource(id = R.drawable.ic_lock),
+                                    contentDescription = null,
+                                )
+                                Text(text = "Lezárás")
+                            }
+                        }
                     }
                 },
                 dismissButton = {
@@ -501,6 +547,18 @@ class MainActivity : ComponentActivity() {
                 confirmButton = {
                     Button(
                         onClick = {
+                            if (!isSelectedArtworkUnlocked) {
+                                startActivity(
+                                    Intent(Intent.ACTION_VIEW, selectedArtwork!!.unlockData.toUri())
+                                )
+                                UserSettings.unlockArtwork(
+                                    context,
+                                    selectedArtwork!!.unlockData
+                                )
+                                selectedArtwork = null
+                                return@Button
+                            }
+
                             selectedArtwork!!.let { artwork ->
                                 when (artwork) {
                                     is WallpaperArtwork -> {
@@ -515,7 +573,7 @@ class MainActivity : ComponentActivity() {
                             selectedArtwork = null
                         }
                     ) {
-                        Text(text = "Beállítás")
+                        Text(text = if (isSelectedArtworkUnlocked) "Beállítás" else "Feloldás")
                     }
                 }
             )
@@ -527,6 +585,10 @@ class MainActivity : ComponentActivity() {
                 artworks.filter { it is WallpaperArtwork }.map { artwork ->
                     MenuScope.ItemInfo(
                         onClick = {
+                            if (!UserSettings.isArtworkUnlocked(context, artwork.unlockData)) {
+                                selectedArtwork = artwork
+                                return@ItemInfo
+                            }
                             (artwork as WallpaperArtwork).set(context)
                         },
                         title = artwork.title,
@@ -549,6 +611,10 @@ class MainActivity : ComponentActivity() {
                 artworks.filter { it is WidgetArtwork<*> }.map { artwork ->
                     MenuScope.ItemInfo(
                         onClick = {
+                            if (!UserSettings.isArtworkUnlocked(context, artwork.unlockData)) {
+                                selectedArtwork = artwork
+                                return@ItemInfo
+                            }
                             (artwork as WidgetArtwork<*>).set(context)
                         },
                         title = artwork.title,

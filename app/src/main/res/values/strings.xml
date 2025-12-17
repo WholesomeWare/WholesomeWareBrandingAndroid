@@ -9,4 +9,7 @@
 
     <string name="template_wallpaper_name">Template wallpaper</string>
     <string name="template_wallpaper_description">A wallpaper to make creating new wallpapers easier.</string>
+
+    <string name="helka_free_flight_dive_wallpaper_name">Helka Free Flight Dive</string>
+    <string name="helka_free_flight_dive_wallpaper_description">A wallpaper featuring Helka\'s two singles.</string>
 </resources>

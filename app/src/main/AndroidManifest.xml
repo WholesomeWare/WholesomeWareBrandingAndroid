@@ -70,6 +70,20 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/template_wallpaper" />
         </service>
+        <service
+            android:name=".wallpaper.HelkaFreeFlightDiveService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/helka_free_flight_dive_wallpaper_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/helka_free_flight_dive_wallpaper" />
+        </service>
 
         <receiver
             android:name=".widget.KoloraFesztAnalogClockWidgetReceiver"

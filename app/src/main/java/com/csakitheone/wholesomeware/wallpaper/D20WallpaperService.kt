@@ -1,7 +1,9 @@
 package com.csakitheone.wholesomeware.wallpaper
 
+import android.app.WallpaperColors
 import android.content.res.Configuration
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.Build
 import android.os.Handler
@@ -11,6 +13,7 @@ import android.os.Vibrator
 import android.service.wallpaper.WallpaperService
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import androidx.annotation.RequiresApi
 import androidx.core.graphics.toColorInt
 import kotlin.math.cos
 import kotlin.math.sin
@@ -68,6 +71,26 @@ class D20WallpaperService : WallpaperService() {
                 this.height = height
                 super.onSurfaceChanged(holder, format, width, height)
                 draw()
+                // Notify system about color changes for Material You theming
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    notifyColorsChanged()
+                }
+            }
+
+            @RequiresApi(Build.VERSION_CODES.O_MR1)
+            override fun onComputeColors(): WallpaperColors {
+                val isDarkMode = (resources.configuration.uiMode and
+                        Configuration.UI_MODE_NIGHT_MASK) ==
+                        Configuration.UI_MODE_NIGHT_YES
+
+                val backgroundColor = if (isDarkMode) "#121212" else "#808080"
+                val foregroundColor = if (isDarkMode) "#808080" else "#121212"
+
+                return WallpaperColors(
+                    Color.valueOf(backgroundColor.toColorInt()),
+                    Color.valueOf(foregroundColor.toColorInt()),
+                    null
+                )
             }
 
             override fun onSurfaceDestroyed(holder: SurfaceHolder?) {

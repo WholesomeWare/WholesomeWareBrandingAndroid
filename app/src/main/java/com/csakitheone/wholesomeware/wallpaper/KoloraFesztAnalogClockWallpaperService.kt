@@ -1,16 +1,19 @@
 package com.csakitheone.wholesomeware.wallpaper
 
+import android.app.WallpaperColors
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.service.wallpaper.WallpaperService
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import androidx.annotation.RequiresApi
 import java.util.Calendar
 import kotlin.math.cos
 import kotlin.math.min
@@ -85,6 +88,30 @@ class KoloraFesztAnalogClockWallpaperService : WallpaperService() {
                 this.width = width
                 this.height = height
                 super.onSurfaceChanged(holder, format, width, height)
+                // Notify system about color changes for Material You theming
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    notifyColorsChanged()
+                }
+            }
+
+            @RequiresApi(Build.VERSION_CODES.O_MR1)
+            override fun onComputeColors(): WallpaperColors {
+                val isDarkMode = (resources.configuration.uiMode and
+                        Configuration.UI_MODE_NIGHT_MASK) ==
+                        Configuration.UI_MODE_NIGHT_YES
+
+                val darkBlue = "#33214b"
+                val brown = "#8d552e"
+                val beige = "#d5c3b6"
+                val primaryColor = if (isDarkMode) darkBlue else beige
+                val secondaryColor = if (isDarkMode) beige else brown
+                val tertiaryColor = if (isDarkMode) brown else darkBlue
+
+                return WallpaperColors(
+                    Color.valueOf(primaryColor.toColorInt()),
+                    Color.valueOf(secondaryColor.toColorInt()),
+                    Color.valueOf(tertiaryColor.toColorInt()),
+                )
             }
 
             override fun onSurfaceDestroyed(holder: SurfaceHolder?) {

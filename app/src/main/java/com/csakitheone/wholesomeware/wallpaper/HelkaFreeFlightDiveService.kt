@@ -32,7 +32,6 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                 isAntiAlias = true
             }
 
-            // Runner to update wallpaper
             private val drawRunnable = object : Runnable {
                 override fun run() {
                     draw()
@@ -99,12 +98,10 @@ class HelkaFreeFlightDiveService : WallpaperService() {
             }
 
             private fun drawCanvas(canvas: Canvas) {
-                // Example: Dark mode detection
                 val isDarkMode = (resources.configuration.uiMode and
                         Configuration.UI_MODE_NIGHT_MASK) ==
                         Configuration.UI_MODE_NIGHT_YES
 
-                // Clear background
                 val backgroundColor = if (isDarkMode) "#1c0b06" else "#fbd5ae"
                 val foregroundColor = if (isDarkMode) "#fbd5ae" else "#2f4e5d"
                 canvas.drawRect(
@@ -115,7 +112,6 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                     backgroundColor.toPaint()
                 )
 
-                // Vignette
                 if (!isDarkMode) {
                     val vignettePaint = Paint().apply {
                         shader = android.graphics.RadialGradient(
@@ -132,9 +128,7 @@ class HelkaFreeFlightDiveService : WallpaperService() {
 
                 val bitmap = getDrawable(R.drawable.helka_szabad_repules_merules)?.toBitmap()
 
-                // Draw bitmap centered with tint
                 bitmap?.let {
-                    // Scale down wallpaper to fit inside screen but keep aspect ratio
                     val scale = minOf(
                         width.toFloat() / it.width,
                         height.toFloat() / it.height

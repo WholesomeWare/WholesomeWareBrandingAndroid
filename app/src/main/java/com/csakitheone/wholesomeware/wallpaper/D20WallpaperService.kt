@@ -117,9 +117,6 @@ class D20WallpaperService : WallpaperService() {
                 super.onTouchEvent(event)
             }
 
-            //
-            // Drawing
-            //
             private fun draw() {
                 val holder = surfaceHolder
                 var canvas: Canvas? = null
@@ -136,12 +133,10 @@ class D20WallpaperService : WallpaperService() {
             }
 
             private fun drawCanvas(canvas: Canvas) {
-                // Example: Dark mode detection
                 val isDarkMode = (resources.configuration.uiMode and
                         Configuration.UI_MODE_NIGHT_MASK) ==
                         Configuration.UI_MODE_NIGHT_YES
 
-                // Clear background
                 val backgroundColor = if (isDarkMode) "#121212" else "#808080"
                 canvas.drawRect(
                     0f,

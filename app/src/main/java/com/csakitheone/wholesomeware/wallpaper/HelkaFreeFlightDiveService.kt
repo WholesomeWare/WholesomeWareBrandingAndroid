@@ -37,7 +37,7 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                 override fun run() {
                     draw()
                     if (visible) {
-                        handler.postDelayed(this, 500L)
+                        handler.postDelayed(this, 200L)
                     }
                 }
             }
@@ -73,7 +73,7 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                         Configuration.UI_MODE_NIGHT_MASK) ==
                         Configuration.UI_MODE_NIGHT_YES
 
-                val backgroundColor = if (isDarkMode) "#080d10" else "#fbd5ae"
+                val backgroundColor = if (isDarkMode) "#1c0b06" else "#fbd5ae"
                 val foregroundColor = if (isDarkMode) "#fbd5ae" else "#2f4e5d"
 
                 return WallpaperColors(
@@ -105,7 +105,7 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                         Configuration.UI_MODE_NIGHT_YES
 
                 // Clear background
-                val backgroundColor = if (isDarkMode) "#080d10" else "#fbd5ae"
+                val backgroundColor = if (isDarkMode) "#1c0b06" else "#fbd5ae"
                 val foregroundColor = if (isDarkMode) "#fbd5ae" else "#2f4e5d"
                 canvas.drawRect(
                     0f,
@@ -114,6 +114,21 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                     height.toFloat(),
                     backgroundColor.toPaint()
                 )
+
+                // Vignette
+                if (!isDarkMode) {
+                    val vignettePaint = Paint().apply {
+                        shader = android.graphics.RadialGradient(
+                            width / 2f,
+                            height / 2f,
+                            (width.coerceAtLeast(height) / 1.5).toFloat(),
+                            intArrayOf(Color.TRANSPARENT, 0x88000000.toInt()),
+                            floatArrayOf(0.4f, 1.0f),
+                            android.graphics.Shader.TileMode.CLAMP
+                        )
+                    }
+                    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), vignettePaint)
+                }
 
                 val bitmap = getDrawable(R.drawable.helka_szabad_repules_merules)?.toBitmap()
 

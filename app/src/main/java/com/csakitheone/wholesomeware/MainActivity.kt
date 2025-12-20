@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.ColorSpace
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.MediaStore
@@ -41,9 +42,12 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FlexibleBottomAppBar
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
@@ -228,6 +232,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            var isMenuOpen by rememberSaveable { mutableStateOf(false) }
             var selectedTab by rememberSaveable { mutableStateOf(TAB_HOME) }
 
             Surface(
@@ -276,7 +281,109 @@ class MainActivity : ComponentActivity() {
                                 colors = TopAppBarDefaults.topAppBarColors(
                                     containerColor = MaterialTheme.colorScheme.primary,
                                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
                                 ),
+                            )
+                            TopAppBar(
+                                title = {},
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Color.Transparent,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                                ),
+                                actions = {
+                                    FilledIconButton(
+                                        onClick = { isMenuOpen = true },
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_more_vert),
+                                            contentDescription = null,
+                                        )
+                                        DropdownMenu(
+                                            expanded = isMenuOpen,
+                                            onDismissRequest = { isMenuOpen = false },
+                                        ) {
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Column {
+                                                        Text(text = "Kolora Egyesület")
+                                                        Text(
+                                                            text = "A WholesomeWare nem hivatalos szülő szervezete",
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                },
+                                                onClick = {
+                                                    startActivity(
+                                                        Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            "https://kolora.web.app/".toUri()
+                                                        )
+                                                    )
+                                                    isMenuOpen = false
+                                                },
+                                                leadingIcon = {
+                                                    Icon(
+                                                        modifier = Modifier.size(24.dp),
+                                                        painter = painterResource(id = R.drawable.ic_kolora),
+                                                        contentDescription = null,
+                                                    )
+                                                },
+                                            )
+                                            DropdownMenuItem(
+                                                text = { Text(text = "Mégtöbb app tőlünk") },
+                                                onClick = {
+                                                    WholesomeWare.openPlayStore(this@MainActivity)
+                                                    isMenuOpen = false
+                                                },
+                                                leadingIcon = {
+                                                    Icon(
+                                                        painter = painterResource(com.csakitheone.wholesomeware_brand.R.drawable.ic_wholesomeware),
+                                                        contentDescription = null,
+                                                    )
+                                                },
+                                            )
+                                            DropdownMenuItem(
+                                                text = { Text(text = "GitHub") },
+                                                onClick = {
+                                                    startActivity(
+                                                        Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            "https://github.com/WholesomeWare".toUri()
+                                                        )
+                                                    )
+                                                    isMenuOpen = false
+                                                },
+                                                leadingIcon = {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_github),
+                                                        contentDescription = null,
+                                                    )
+                                                },
+                                            )
+                                            DropdownMenuItem(
+                                                text = { Text(text = "App kódja") },
+                                                onClick = {
+                                                    startActivity(
+                                                        Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            "https://github.com/WholesomeWare/WholesomeWareBrandingAndroid".toUri()
+                                                        )
+                                                    )
+                                                    isMenuOpen = false
+                                                },
+                                                leadingIcon = {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_code),
+                                                        contentDescription = null,
+                                                    )
+                                                },
+                                            )
+                                        }
+                                    }
+                                },
                             )
                         }
                     }
@@ -299,15 +406,14 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                    FlexibleBottomAppBar {
+                    NavigationBar {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            ShortNavigationBarItem(
-                                iconPosition = NavigationItemIconPosition.Start,
+                            NavigationBarItem(
                                 selected = selectedTab == TAB_HOME,
                                 onClick = { selectedTab = TAB_HOME },
                                 icon = {
@@ -316,14 +422,9 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = null,
                                     )
                                 },
-                                label = {
-                                    AnimatedVisibility(visible = selectedTab == TAB_HOME) {
-                                        Text(text = "Kezdőlap")
-                                    }
-                                },
+                                label = { Text(text = "Főoldal") },
                             )
-                            ShortNavigationBarItem(
-                                iconPosition = NavigationItemIconPosition.Start,
+                            NavigationBarItem(
                                 selected = selectedTab == TAB_ARTWORKS,
                                 onClick = { selectedTab = TAB_ARTWORKS },
                                 icon = {
@@ -332,14 +433,9 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = null,
                                     )
                                 },
-                                label = {
-                                    AnimatedVisibility(visible = selectedTab == TAB_ARTWORKS) {
-                                        Text(text = "Alkotások")
-                                    }
-                                },
+                                label = { Text(text = "Alkotások") },
                             )
-                            ShortNavigationBarItem(
-                                iconPosition = NavigationItemIconPosition.Start,
+                            NavigationBarItem(
                                 selected = selectedTab == TAB_EXPERIMENTS,
                                 onClick = { selectedTab = TAB_EXPERIMENTS },
                                 icon = {
@@ -348,11 +444,7 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = null,
                                     )
                                 },
-                                label = {
-                                    AnimatedVisibility(visible = selectedTab == TAB_EXPERIMENTS) {
-                                        Text(text = "Kísérletek")
-                                    }
-                                },
+                                label = { Text(text = "Kísérletek") },
                             )
                         }
                     }
@@ -368,7 +460,7 @@ class MainActivity : ComponentActivity() {
         onTabChangeRequest: (String) -> Unit = { _ -> },
     ) {
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
-            ElevatedCard(shape = WWMenuDefaults.cardSingleItemShape()) {
+            ElevatedCard(shape = WWMenuDefaults.cardFirstItemShape()) {
                 Text(
                     modifier = Modifier.padding(16.dp),
                     text = "“You might not think that programmers are artists, but programming is an extremely creative profession. It’s logic-based creativity.”\n– John Romero",
@@ -376,12 +468,19 @@ class MainActivity : ComponentActivity() {
                     fontStyle = FontStyle.Italic,
                 )
             }
+            WWMenuDefaults.itemsSpacer()
+            ElevatedCard(shape = WWMenuDefaults.cardLastItemShape()) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = "A WholesomeWare app digitális alkotások gyűjteménye.",
+                )
+            }
             WWMenuDefaults.sectionSpacer()
             items(
                 MenuScope.ItemInfo(
                     onClick = { onTabChangeRequest(TAB_ARTWORKS) },
                     title = "Alkotások",
-                    description = "Élő hátterek és widget-ek gyűjteménye",
+                    description = "Élő hátterek és widget-ek",
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_palette),
@@ -397,71 +496,6 @@ class MainActivity : ComponentActivity() {
                             painter = painterResource(id = R.drawable.ic_experiment),
                             contentDescription = null,
                         )
-                    },
-                ),
-            )
-            WWMenuDefaults.sectionSpacer()
-            items(
-                MenuScope.ItemInfo(
-                    onClick = {
-                        startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                "https://kolora.web.app/".toUri()
-                            )
-                        )
-                    },
-                    title = "Kolora Egyesület",
-                    description = "A WholesomeWare nem hivatalos szülő szervezete",
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(id = R.drawable.ic_kolora),
-                            contentDescription = null,
-                        )
-                    },
-                ),
-                MenuScope.ItemInfo(
-                    onClick = {
-                        WholesomeWare.openPlayStore(this@MainActivity)
-                    },
-                    title = "Mégtöbb app tőlünk",
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(com.csakitheone.wholesomeware_brand.R.drawable.ic_wholesomeware),
-                            contentDescription = null,
-                        )
-                    },
-                ),
-                MenuScope.ItemInfo(
-                    onClick = {
-                        startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                "https://github.com/WholesomeWare".toUri()
-                            )
-                        )
-                    },
-                    title = "GitHub",
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_github),
-                            contentDescription = null,
-                        )
-                    },
-                    trailingIcon = {
-                        OutlinedButton(
-                            onClick = {
-                                startActivity(
-                                    Intent(
-                                        Intent.ACTION_VIEW,
-                                        "https://github.com/WholesomeWare/WholesomeWare".toUri()
-                                    )
-                                )
-                            },
-                        ) {
-                            Text(text = "App kódja")
-                        }
                     },
                 ),
             )
@@ -514,8 +548,7 @@ class MainActivity : ComponentActivity() {
                                     Text(text = selectedArtwork!!.unlockDescription)
                                 }
                             }
-                        }
-                        else if (!selectedArtwork?.unlockData.isNullOrBlank()) {
+                        } else if (!selectedArtwork?.unlockData.isNullOrBlank()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             OutlinedButton(
                                 modifier = Modifier.fillMaxWidth(),

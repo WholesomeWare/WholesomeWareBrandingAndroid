@@ -106,6 +106,7 @@ fun getArtworks(context: Context): List<Artwork> {
         WallpaperArtwork(
             title = "Világítótorony",
             author = "M. Lia",
+            description = "Fények a sötétben és repülő madarak a világosban.",
             componentName = ComponentName(
                 context,
                 LighthouseWallpaperService::class.java

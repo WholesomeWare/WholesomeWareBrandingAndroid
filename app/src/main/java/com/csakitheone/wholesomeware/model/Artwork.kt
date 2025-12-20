@@ -11,6 +11,7 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
 import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
+import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
@@ -100,6 +101,14 @@ fun getArtworks(context: Context): List<Artwork> {
             componentName = ComponentName(
                 context,
                 HelkaFreeFlightDiveService::class.java
+            ),
+        ),
+        WallpaperArtwork(
+            title = "Világítótorony",
+            author = "M. Lia",
+            componentName = ComponentName(
+                context,
+                LighthouseWallpaperService::class.java
             ),
         ),
         WidgetArtwork(

@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.csakitheone.wholesomeware" />
+                  <option name="mobileSdkAppId" value="1:365879102049:android:8e91ff07f4bfff44cdb820" />
+                  <option name="projectId" value="nc-workshop" />
+                  <option name="projectNumber" value="365879102049" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

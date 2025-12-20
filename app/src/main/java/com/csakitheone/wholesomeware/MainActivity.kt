@@ -41,6 +41,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -105,6 +106,7 @@ import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperSe
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import com.csakitheone.wholesomeware.experiment.EventRecommendationAI
 import com.csakitheone.wholesomeware.experiment.NetworkUtils
 import com.csakitheone.wholesomeware.model.Artwork
 import com.csakitheone.wholesomeware.model.WallpaperArtwork
@@ -674,8 +676,12 @@ class MainActivity : ComponentActivity() {
         modifier: Modifier = Modifier,
     ) {
         val coroutineScope = rememberCoroutineScope()
+
         var isPlaying by remember { mutableStateOf(false) }
         var radioNowPlaying by remember { mutableStateOf<String?>(null) }
+
+        var isEventRecommendationDialogOpen by remember { mutableStateOf(false) }
+        var eventRecommendationSummary by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) {
             NetworkUtils.disableSSLCertificateVerify()
@@ -806,6 +812,51 @@ class MainActivity : ComponentActivity() {
                     description = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH,
                 ),
             )
+            title("További kísérletek hamarosan...")
+            /*items(
+                MenuScope.ItemInfo(
+                    onClick = { isEventRecommendationDialogOpen = true },
+                    title = "Esemény ajánló",
+                    trailingIcon = {
+                        if (isEventRecommendationDialogOpen) {
+                            AlertDialog(
+                                onDismissRequest = { isEventRecommendationDialogOpen = false },
+                                title = { Text(text = "Esemény ajánló") },
+                                text = {
+                                    if (eventRecommendationSummary == null) {
+                                        LaunchedEffect(Unit) {
+                                            eventRecommendationSummary =
+                                                EventRecommendationAI.getUpcomingEventsSummary()
+                                        }
+                                        Box(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            CircularProgressIndicator()
+                                        }
+                                    } else {
+                                        Text(
+                                            modifier = Modifier
+                                                .verticalScroll(rememberScrollState()),
+                                            text = eventRecommendationSummary
+                                                ?: "Sajnálom, nem sikerült ajánlót készíteni."
+                                        )
+                                    }
+                                },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            isEventRecommendationDialogOpen = false
+                                        }
+                                    ) {
+                                        Text(text = "Bezárás")
+                                    }
+                                },
+                            )
+                        }
+                    },
+                ),
+            )*/
         }
     }
 }

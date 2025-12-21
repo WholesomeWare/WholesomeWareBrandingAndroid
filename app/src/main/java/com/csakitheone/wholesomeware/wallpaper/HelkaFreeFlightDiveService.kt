@@ -2,6 +2,7 @@ package com.csakitheone.wholesomeware.wallpaper
 
 import android.app.WallpaperColors
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -26,6 +27,8 @@ class HelkaFreeFlightDiveService : WallpaperService() {
             private var width = 0
             private var height = 0
 
+            private var bitmap: Bitmap? = null
+
             private fun String.toPaint(): Paint = Paint().apply {
                 color = this@toPaint.toColorInt()
                 style = Paint.Style.FILL
@@ -41,9 +44,15 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                 }
             }
 
+            override fun onCreate(surfaceHolder: SurfaceHolder?) {
+                super.onCreate(surfaceHolder)
+                bitmap = getDrawable(R.drawable.helka_szabad_repules_merules)?.toBitmap()
+            }
+
             override fun onVisibilityChanged(visible: Boolean) {
                 this.visible = visible
                 if (visible) {
+                    bitmap = getDrawable(R.drawable.helka_szabad_repules_merules)?.toBitmap()
                     handler.post(drawRunnable)
                 } else {
                     handler.removeCallbacks(drawRunnable)
@@ -125,8 +134,6 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                     }
                     canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), vignettePaint)
                 }
-
-                val bitmap = getDrawable(R.drawable.helka_szabad_repules_merules)?.toBitmap()
 
                 bitmap?.let {
                     val scale = minOf(

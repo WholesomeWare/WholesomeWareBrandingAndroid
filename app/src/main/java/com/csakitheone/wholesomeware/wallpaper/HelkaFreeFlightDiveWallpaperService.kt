@@ -8,9 +8,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.media.audiofx.Visualizer
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.service.wallpaper.WallpaperService
 import android.view.SurfaceHolder
 import androidx.annotation.RequiresApi
@@ -18,16 +20,21 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import com.csakitheone.wholesomeware.R
+import kotlin.math.max
 
-class HelkaFreeFlightDiveService : WallpaperService() {
+class HelkaFreeFlightDiveWallpaperService : WallpaperService() {
     override fun onCreateEngine(): Engine {
         return object : Engine() {
+            private lateinit var powerManager: PowerManager
             private val handler = Handler(Looper.getMainLooper())
             private var visible = false
             private var width = 0
             private var height = 0
 
             private var bitmap: Bitmap? = null
+            private var visualizerRetryRate = 0
+            private var visualizer: Visualizer? = null
+            private var visualizerData: ByteArray = ByteArray(128) { 0 }
 
             private fun String.toPaint(): Paint = Paint().apply {
                 color = this@toPaint.toColorInt()
@@ -37,9 +44,19 @@ class HelkaFreeFlightDiveService : WallpaperService() {
 
             private val drawRunnable = object : Runnable {
                 override fun run() {
+                    val framerate = if (powerManager.isPowerSaveMode) 1
+                    else if (visualizer != null) 120
+                    else 60
+
+                    if (visible && !powerManager.isPowerSaveMode && visualizer == null && visualizerRetryRate > framerate / 4) {
+                        initializeVisualizer()
+                        visualizerRetryRate = 0
+                    }
+                    visualizerRetryRate++
+
                     draw()
                     if (visible) {
-                        handler.postDelayed(this, 200L)
+                        handler.postDelayed(this, 1000L / framerate)
                     }
                 }
             }
@@ -47,14 +64,59 @@ class HelkaFreeFlightDiveService : WallpaperService() {
             override fun onCreate(surfaceHolder: SurfaceHolder?) {
                 super.onCreate(surfaceHolder)
                 bitmap = getDrawable(R.drawable.helka_szabad_repules_merules)?.toBitmap()
+                powerManager = getSystemService(PowerManager::class.java)
+            }
+
+            private fun initializeVisualizer() {
+                visualizer?.release()
+                visualizer = null
+                try {
+                    visualizer = Visualizer(0).apply {
+                        enabled = false
+                        captureSize = Visualizer.getCaptureSizeRange()[1]
+                        setDataCaptureListener(object : Visualizer.OnDataCaptureListener {
+                            override fun onWaveFormDataCapture(
+                                v: Visualizer?,
+                                waveform: ByteArray?,
+                                samplingRate: Int
+                            ) {
+                                visualizerData = (waveform ?: ByteArray(128) { 0 })
+                                        .take(128)
+                                        .toByteArray()
+                                val isSilent =
+                                    waveform?.all { it == waveform.firstOrNull() } != false
+                                if (waveform == null || isSilent) {
+                                    // Release visualizer if no audio is playing
+                                    visualizer?.release()
+                                    visualizer = null
+                                }
+                            }
+
+                            override fun onFftDataCapture(
+                                visualizer: Visualizer?,
+                                fft: ByteArray?,
+                                samplingRate: Int
+                            ) {
+                                // Not used
+                            }
+                        }, Visualizer.getMaxCaptureRate(), true, false)
+                        enabled = true
+                    }
+                } catch (e: Exception) {
+                    // Visualizer may fail if no audio session is active
+                    visualizer = null
+                }
             }
 
             override fun onVisibilityChanged(visible: Boolean) {
                 this.visible = visible
                 if (visible) {
                     bitmap = getDrawable(R.drawable.helka_szabad_repules_merules)?.toBitmap()
+                    initializeVisualizer()
                     handler.post(drawRunnable)
                 } else {
+                    visualizer?.release()
+                    visualizer = null
                     handler.removeCallbacks(drawRunnable)
                 }
             }
@@ -155,6 +217,32 @@ class HelkaFreeFlightDiveService : WallpaperService() {
                     }
 
                     canvas.drawBitmap(scaledBitmap, left, top, paint)
+
+                    // Draw audio visualizer
+                    val dotWidth = scaledBitmap.width / 5 / visualizerData.size.toFloat()
+                    for (i in visualizerData.indices) {
+                        val magnitudeXModifier = 1f - (i.toFloat() / visualizerData.size.toFloat())
+                        val magnitude =
+                            (visualizerData[i] + 128).toFloat() / 256f * magnitudeXModifier
+                        val x = left + scaledBitmap.width * .08f + i * dotWidth
+                        val x2 = left + scaledBitmap.width * .92f - i * dotWidth
+                        val y =
+                            top + scaledBitmap.height / 2.08f - magnitude * scaledBitmap.height / 32
+                        canvas.drawRect(
+                            x,
+                            y - dotWidth,
+                            x + .75f,
+                            y + 2,
+                            foregroundColor.toPaint()
+                        )
+                        canvas.drawRect(
+                            x2,
+                            y - dotWidth,
+                            x2 + .75f,
+                            y + 2,
+                            foregroundColor.toPaint()
+                        )
+                    }
                 }
             }
         }

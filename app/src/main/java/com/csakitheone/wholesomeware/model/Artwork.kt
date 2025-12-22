@@ -1,20 +1,23 @@
 package com.csakitheone.wholesomeware.model
 
+import android.app.Activity
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
-import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveService
+import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 interface Artwork {
     val title: String
@@ -23,6 +26,7 @@ interface Artwork {
     val unlockDescription: String
     val unlockData: String
     val tags: List<String>
+    val permissions: List<String>
 }
 
 data class WallpaperArtwork(
@@ -32,9 +36,22 @@ data class WallpaperArtwork(
     override val unlockDescription: String = "",
     override val unlockData: String = "",
     override val tags: List<String> = emptyList(),
+    override val permissions: List<String> = emptyList(),
     val componentName: ComponentName,
 ) : Artwork {
-    fun set(context: Context) {
+    fun set(context: Activity) {
+        val missingPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(
+                context,
+                it
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            context.requestPermissions(permissions.toTypedArray(), abs(hashCode()))
+            return
+        }
+
         try {
             val intent =
                 Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
@@ -60,10 +77,23 @@ data class WidgetArtwork<T>(
     override val unlockDescription: String = "",
     override val unlockData: String = "",
     override val tags: List<String> = emptyList(),
+    override val permissions: List<String> = emptyList(),
     val receiver: Class<T>,
     val widget: GlanceAppWidget,
 ): Artwork {
-    fun set(context: Context) {
+    fun set(context: Activity) {
+        val missingPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(
+                context,
+                it
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            context.requestPermissions(permissions.toTypedArray(), abs(hashCode()))
+            return
+        }
+
         GlobalScope.launch {
             GlanceAppWidgetManager(context).requestPinGlanceAppWidget(
                 receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
@@ -103,9 +133,13 @@ fun getArtworks(context: Context): List<Artwork> {
             unlockDescription = "Feloldáshoz látogasd meg Helka weboldalát.",
             unlockData = "https://www.helkamusic.hu/",
             tags = listOf("rajz"),
+            permissions = listOf(
+                android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
+            ),
             componentName = ComponentName(
                 context,
-                HelkaFreeFlightDiveService::class.java
+                HelkaFreeFlightDiveWallpaperService::class.java
             ),
         ),
         WallpaperArtwork(

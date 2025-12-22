@@ -441,6 +441,8 @@ class MainActivity : ComponentActivity() {
         modifier: Modifier = Modifier,
         onTabChangeRequest: (String) -> Unit = { _ -> },
     ) {
+        val context = LocalContext.current
+
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
             ElevatedCard(shape = WWMenuDefaults.cardFirstItemShape()) {
                 Text(
@@ -461,7 +463,7 @@ class MainActivity : ComponentActivity() {
             items(
                 MenuScope.ItemInfo(
                     onClick = { onTabChangeRequest(TAB_ARTWORKS) },
-                    title = "Alkotások",
+                    title = "Alkotások (${getArtworks(context).size})",
                     description = "Élő hátterek és widget-ek",
                     leadingIcon = {
                         Icon(
@@ -504,17 +506,23 @@ class MainActivity : ComponentActivity() {
                 onDismissRequest = { selectedArtwork = null },
                 title = { Text(text = selectedArtwork!!.title) },
                 text = {
-                    Column {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
                         Text(text = "Készítő: ${selectedArtwork!!.artist}")
                         if (selectedArtwork!!.description.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = selectedArtwork!!.description,
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
+                        if (selectedArtwork!!.tags.isNotEmpty()) {
+                            Text(
+                                text = selectedArtwork!!.tags.joinToString { "#$it" },
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                         if (!isSelectedArtworkUnlocked) {
-                            Spacer(modifier = Modifier.height(8.dp))
                             OutlinedCard {
                                 Row(
                                     modifier = Modifier
@@ -526,12 +534,14 @@ class MainActivity : ComponentActivity() {
                                         painter = painterResource(id = R.drawable.ic_lock),
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.size(8.dp))
-                                    Text(text = selectedArtwork!!.unlockDescription)
+                                    Spacer(modifier = Modifier.size(16.dp))
+                                    Text(
+                                        text = selectedArtwork!!.unlockDescription,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
                                 }
                             }
                         } else if (!selectedArtwork?.unlockData.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(8.dp))
                             OutlinedButton(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
@@ -607,7 +617,7 @@ class MainActivity : ComponentActivity() {
                             (artwork as WallpaperArtwork).set(context)
                         },
                         title = artwork.title,
-                        description = "by ${artwork.artist} - ${artwork.description}",
+                        description = "by ${artwork.artist} ${artwork.tags.joinToString { "#$it" }}",
                         trailingIcon = {
                             IconButton(
                                 onClick = { selectedArtwork = artwork }
@@ -633,7 +643,7 @@ class MainActivity : ComponentActivity() {
                             (artwork as WidgetArtwork<*>).set(context)
                         },
                         title = artwork.title,
-                        description = "by ${artwork.artist} - ${artwork.description}",
+                        description = "by ${artwork.artist} ${artwork.tags.joinToString { "#$it" }}",
                         trailingIcon = {
                             IconButton(
                                 onClick = { selectedArtwork = artwork }

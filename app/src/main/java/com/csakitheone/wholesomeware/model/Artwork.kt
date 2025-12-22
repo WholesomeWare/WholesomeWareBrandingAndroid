@@ -88,6 +88,8 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "Kolora Feszt óra",
             artist = ARTIST_CSAKI,
             description = "Analóg óra a 2025-ös Kolora Feszt plakátja stílusában.",
+            unlockDescription = "Feloldáshoz látogasd meg a Kolora Egyesület weboldalát.",
+            unlockData = "https://kolora.web.app/",
             tags = listOf("kolora"),
             componentName = ComponentName(
                 context,
@@ -98,9 +100,9 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "szabad repülés - szabad merülés",
             artist = ARTIST_HELKA,
             description = "Helka két kislemez borítójából készült grafika.",
-            tags = listOf("rajz"),
             unlockDescription = "Feloldáshoz látogasd meg Helka weboldalát.",
             unlockData = "https://www.helkamusic.hu/",
+            tags = listOf("rajz"),
             componentName = ComponentName(
                 context,
                 HelkaFreeFlightDiveService::class.java
@@ -120,6 +122,8 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "Kolora Feszt óra",
             artist = ARTIST_CSAKI,
             description = "Analóg óra a 2025-ös Kolora Feszt plakátja stílusában.",
+            unlockDescription = "Feloldáshoz látogasd meg a Kolora Egyesület weboldalát.",
+            unlockData = "https://kolora.web.app/",
             tags = listOf("kolora"),
             receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
             widget = KoloraFesztAnalogClockWidget(),

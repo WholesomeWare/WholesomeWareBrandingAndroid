@@ -10,7 +10,7 @@ data class Artist(
 }
 
 val ARTIST_CSAKI = Artist(
-    name = "Csaki The One",
+    name = "Csáki",
     socials = mapOf(
         "Instagram" to "https://www.instagram.com/csakitheone/",
     ),

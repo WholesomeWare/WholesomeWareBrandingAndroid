@@ -6,7 +6,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.ColorSpace
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.MediaStore
@@ -16,7 +15,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +27,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -37,11 +34,8 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,24 +43,16 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FlexibleBottomAppBar
-import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.NavigationItemIconPosition
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.ShortNavigationBar
-import androidx.compose.material3.ShortNavigationBarItem
-import androidx.compose.material3.ShortNavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.material3.TopAppBar
@@ -102,11 +88,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.csakitheone.wholesomeware.ui.components.Menu
 import com.csakitheone.wholesomeware.ui.components.MenuScope
-import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import com.csakitheone.wholesomeware.experiment.EventRecommendationAI
 import com.csakitheone.wholesomeware.experiment.NetworkUtils
 import com.csakitheone.wholesomeware.model.Artwork
 import com.csakitheone.wholesomeware.model.WallpaperArtwork
@@ -114,9 +97,6 @@ import com.csakitheone.wholesomeware.model.WidgetArtwork
 import com.csakitheone.wholesomeware.model.getArtworks
 import com.csakitheone.wholesomeware.service.RadioService
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
-import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
-import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
-import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
 import com.csakitheone.wholesomeware_brand.WholesomeWare
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -474,7 +454,7 @@ class MainActivity : ComponentActivity() {
             ElevatedCard(shape = WWMenuDefaults.cardLastItemShape()) {
                 Text(
                     modifier = Modifier.padding(16.dp),
-                    text = "A WholesomeWare app digitális alkotások gyűjteménye.",
+                    text = "A WholesomeWare app digitális alkotások gyűjteménye, amelyeket barátaim vagy jómagam készítettek.",
                 )
             }
             WWMenuDefaults.sectionSpacer()
@@ -525,7 +505,7 @@ class MainActivity : ComponentActivity() {
                 title = { Text(text = selectedArtwork!!.title) },
                 text = {
                     Column {
-                        Text(text = "Készítő: ${selectedArtwork!!.author}")
+                        Text(text = "Készítő: ${selectedArtwork!!.artist}")
                         if (selectedArtwork!!.description.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
@@ -627,7 +607,7 @@ class MainActivity : ComponentActivity() {
                             (artwork as WallpaperArtwork).set(context)
                         },
                         title = artwork.title,
-                        description = "by ${artwork.author} - ${artwork.description}",
+                        description = "by ${artwork.artist} - ${artwork.description}",
                         trailingIcon = {
                             IconButton(
                                 onClick = { selectedArtwork = artwork }
@@ -653,7 +633,7 @@ class MainActivity : ComponentActivity() {
                             (artwork as WidgetArtwork<*>).set(context)
                         },
                         title = artwork.title,
-                        description = "by ${artwork.author} - ${artwork.description}",
+                        description = "by ${artwork.artist} - ${artwork.description}",
                         trailingIcon = {
                             IconButton(
                                 onClick = { selectedArtwork = artwork }

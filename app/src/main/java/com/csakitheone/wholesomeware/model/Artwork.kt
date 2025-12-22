@@ -7,12 +7,10 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
 import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
-import com.csakitheone.wholesomeware.wallpaper.TemplateWallpaperService
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
 import kotlinx.coroutines.GlobalScope
@@ -20,18 +18,20 @@ import kotlinx.coroutines.launch
 
 interface Artwork {
     val title: String
-    val author: String
+    val artist: Artist
     val description: String
     val unlockDescription: String
     val unlockData: String
+    val tags: List<String>
 }
 
 data class WallpaperArtwork(
     override val title: String,
-    override val author: String,
+    override val artist: Artist,
     override val description: String = "",
     override val unlockDescription: String = "",
     override val unlockData: String = "",
+    override val tags: List<String> = emptyList(),
     val componentName: ComponentName,
 ) : Artwork {
     fun set(context: Context) {
@@ -55,10 +55,11 @@ data class WallpaperArtwork(
 
 data class WidgetArtwork<T>(
     override val title: String,
-    override val author: String,
+    override val artist: Artist,
     override val description: String = "",
     override val unlockDescription: String = "",
     override val unlockData: String = "",
+    override val tags: List<String> = emptyList(),
     val receiver: Class<T>,
     val widget: GlanceAppWidget,
 ): Artwork {
@@ -76,7 +77,7 @@ fun getArtworks(context: Context): List<Artwork> {
     return listOf(
         WallpaperArtwork(
             title = "D20",
-            author = "Csáki",
+            artist = ARTIST_CSAKI,
             description = "Koppints duplán a kocka megforgatásához!",
             componentName = ComponentName(
                 context,
@@ -85,8 +86,9 @@ fun getArtworks(context: Context): List<Artwork> {
         ),
         WallpaperArtwork(
             title = "Kolora Feszt óra",
-            author = "Csáki",
+            artist = ARTIST_CSAKI,
             description = "Analóg óra a 2025-ös Kolora Feszt plakátja stílusában.",
+            tags = listOf("kolora"),
             componentName = ComponentName(
                 context,
                 KoloraFesztAnalogClockWallpaperService::class.java
@@ -94,8 +96,9 @@ fun getArtworks(context: Context): List<Artwork> {
         ),
         WallpaperArtwork(
             title = "szabad repülés - szabad merülés",
-            author = "Helka",
+            artist = ARTIST_HELKA,
             description = "Helka két kislemez borítójából készült grafika.",
+            tags = listOf("rajz"),
             unlockDescription = "Feloldáshoz látogasd meg Helka weboldalát.",
             unlockData = "https://www.helkamusic.hu/",
             componentName = ComponentName(
@@ -105,8 +108,9 @@ fun getArtworks(context: Context): List<Artwork> {
         ),
         WallpaperArtwork(
             title = "Világítótorony",
-            author = "M. Lia",
+            artist = ARTIST_M_LIA,
             description = "Fények a sötétben és repülő madarak a világosban.",
+            tags = listOf("rajz"),
             componentName = ComponentName(
                 context,
                 LighthouseWallpaperService::class.java
@@ -114,8 +118,9 @@ fun getArtworks(context: Context): List<Artwork> {
         ),
         WidgetArtwork(
             title = "Kolora Feszt óra",
-            author = "Csáki",
+            artist = ARTIST_CSAKI,
             description = "Analóg óra a 2025-ös Kolora Feszt plakátja stílusában.",
+            tags = listOf("kolora"),
             receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
             widget = KoloraFesztAnalogClockWidget(),
         ),

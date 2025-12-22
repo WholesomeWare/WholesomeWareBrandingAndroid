@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
@@ -78,7 +79,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
@@ -488,14 +488,14 @@ class MainActivity : ComponentActivity() {
     private fun TabArtworks(
         modifier: Modifier = Modifier,
     ) {
-        val context = LocalContext.current
-        val artworks = remember { getArtworks(context) }
+        val activity = LocalActivity.current!!
+        val artworks = remember { getArtworks(activity) }
 
         var selectedArtwork by remember { mutableStateOf<Artwork?>(null) }
         val isSelectedArtworkUnlocked by remember {
             derivedStateOf {
                 if (selectedArtwork == null) return@derivedStateOf false
-                UserSettings.isArtworkUnlocked(context, selectedArtwork!!.unlockData)
+                UserSettings.isArtworkUnlocked(activity, selectedArtwork!!.unlockData)
             }
         }
 
@@ -536,7 +536,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
                                     UserSettings.lockArtwork(
-                                        context,
+                                        activity,
                                         selectedArtwork!!.unlockData
                                     )
                                     selectedArtwork = null
@@ -567,7 +567,7 @@ class MainActivity : ComponentActivity() {
                                     Intent(Intent.ACTION_VIEW, selectedArtwork!!.unlockData.toUri())
                                 )
                                 UserSettings.unlockArtwork(
-                                    context,
+                                    activity,
                                     selectedArtwork!!.unlockData
                                 )
                                 selectedArtwork = null
@@ -577,11 +577,11 @@ class MainActivity : ComponentActivity() {
                             selectedArtwork!!.let { artwork ->
                                 when (artwork) {
                                     is WallpaperArtwork -> {
-                                        artwork.set(context)
+                                        artwork.set(activity)
                                     }
 
                                     is WidgetArtwork<*> -> {
-                                        artwork.set(context)
+                                        artwork.set(activity)
                                     }
                                 }
                             }
@@ -600,11 +600,11 @@ class MainActivity : ComponentActivity() {
                 artworks.filter { it is WallpaperArtwork }.map { artwork ->
                     MenuScope.ItemInfo(
                         onClick = {
-                            if (!UserSettings.isArtworkUnlocked(context, artwork.unlockData)) {
+                            if (!UserSettings.isArtworkUnlocked(activity, artwork.unlockData)) {
                                 selectedArtwork = artwork
                                 return@ItemInfo
                             }
-                            (artwork as WallpaperArtwork).set(context)
+                            (artwork as WallpaperArtwork).set(activity)
                         },
                         title = artwork.title,
                         description = "by ${artwork.artist} - ${artwork.description}",
@@ -626,11 +626,11 @@ class MainActivity : ComponentActivity() {
                 artworks.filter { it is WidgetArtwork<*> }.map { artwork ->
                     MenuScope.ItemInfo(
                         onClick = {
-                            if (!UserSettings.isArtworkUnlocked(context, artwork.unlockData)) {
+                            if (!UserSettings.isArtworkUnlocked(activity, artwork.unlockData)) {
                                 selectedArtwork = artwork
                                 return@ItemInfo
                             }
-                            (artwork as WidgetArtwork<*>).set(context)
+                            (artwork as WidgetArtwork<*>).set(activity)
                         },
                         title = artwork.title,
                         description = "by ${artwork.artist} - ${artwork.description}",

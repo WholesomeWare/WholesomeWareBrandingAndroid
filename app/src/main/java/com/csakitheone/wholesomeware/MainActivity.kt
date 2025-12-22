@@ -44,6 +44,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -328,6 +329,19 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 },
                                             )
+                                            HorizontalDivider()
+                                            DropdownMenuItem(
+                                                text = { Text(text = "App Play Áruház oldala") },
+                                                onClick = {
+                                                    startActivity(
+                                                        Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            "https://play.google.com/store/apps/details?id=com.csakitheone.wholesomeware".toUri()
+                                                        )
+                                                    )
+                                                },
+                                            )
+                                            HorizontalDivider()
                                             DropdownMenuItem(
                                                 text = { Text(text = "GitHub") },
                                                 onClick = {

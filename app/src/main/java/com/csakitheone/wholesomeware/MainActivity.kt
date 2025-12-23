@@ -290,47 +290,6 @@ class MainActivity : ComponentActivity() {
                                             onDismissRequest = { isMenuOpen = false },
                                         ) {
                                             DropdownMenuItem(
-                                                text = {
-                                                    Column {
-                                                        Text(text = "Kolora Egyesület")
-                                                        Text(
-                                                            text = "A WholesomeWare nem hivatalos szülő szervezete",
-                                                            style = MaterialTheme.typography.labelSmall,
-                                                        )
-                                                    }
-                                                },
-                                                onClick = {
-                                                    startActivity(
-                                                        Intent(
-                                                            Intent.ACTION_VIEW,
-                                                            "https://kolora.web.app/".toUri()
-                                                        )
-                                                    )
-                                                    isMenuOpen = false
-                                                },
-                                                leadingIcon = {
-                                                    Icon(
-                                                        modifier = Modifier.size(24.dp),
-                                                        painter = painterResource(id = R.drawable.ic_kolora),
-                                                        contentDescription = null,
-                                                    )
-                                                },
-                                            )
-                                            DropdownMenuItem(
-                                                text = { Text(text = "Mégtöbb app tőlünk") },
-                                                onClick = {
-                                                    WholesomeWare.openPlayStore(this@MainActivity)
-                                                    isMenuOpen = false
-                                                },
-                                                leadingIcon = {
-                                                    Icon(
-                                                        painter = painterResource(com.csakitheone.wholesomeware_brand.R.drawable.ic_wholesomeware),
-                                                        contentDescription = null,
-                                                    )
-                                                },
-                                            )
-                                            HorizontalDivider()
-                                            DropdownMenuItem(
                                                 text = { Text(text = "App Play Áruház oldala") },
                                                 onClick = {
                                                     startActivity(
@@ -497,6 +456,35 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                 ),
+                MenuScope.ItemInfo(
+                    onClick = { WholesomeWare.openPlayStore(this@MainActivity) },
+                    title = "Mégtöbb app tőlünk",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(com.csakitheone.wholesomeware_brand.R.drawable.ic_wholesomeware),
+                            contentDescription = null,
+                        )
+                    },
+                ),
+                MenuScope.ItemInfo(
+                    onClick = {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                "https://kolora.web.app/".toUri()
+                            )
+                        )
+                    },
+                    title = "Kolora Egyesület",
+                    description = "A WW nem hivatalos szülő szervezete",
+                    leadingIcon = {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            painter = painterResource(id = R.drawable.ic_kolora),
+                            contentDescription = null,
+                        )
+                    },
+                )
             )
         }
     }

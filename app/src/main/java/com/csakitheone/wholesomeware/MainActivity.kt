@@ -270,6 +270,32 @@ class MainActivity : ComponentActivity() {
                                 ),
                                 actions = {
                                     FilledIconButton(
+                                        onClick = {
+                                            val shareLink = "https://play.google.com/store/apps/details?id=com.csakitheone.wholesomeware"
+                                            startActivity(
+                                                Intent.createChooser(
+                                                    Intent(Intent.ACTION_SEND).apply {
+                                                        type = "text/plain"
+                                                        putExtra(
+                                                            Intent.EXTRA_SUBJECT,
+                                                            "Próbáld ki a WholesomeWare appot!"
+                                                        )
+                                                        putExtra(
+                                                            Intent.EXTRA_TEXT,
+                                                            shareLink
+                                                        )
+                                                    },
+                                                    "Megosztás"
+                                                )
+                                            )
+                                        },
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = androidx.media3.session.R.drawable.media3_icon_share),
+                                            contentDescription = null,
+                                        )
+                                    }
+                                    FilledIconButton(
                                         onClick = { isMenuOpen = true },
                                     ) {
                                         Icon(

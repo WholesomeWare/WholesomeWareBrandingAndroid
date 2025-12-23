@@ -166,24 +166,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun setLiveWallpaper(wallpaperComponentName: ComponentName) {
-        try {
-            val intent =
-                Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
-            intent.putExtra(
-                WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                wallpaperComponentName
-            )
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(
-                this@MainActivity,
-                "Error setting wallpaper: ${e.message}",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     @Preview
@@ -669,6 +651,63 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             )
+            title("Alkoss te is!")
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = "Ha van ötleted, rajzod, grafikád vagy bármi, amiből élő hátteret vagy widget-et lehetne készíteni, keress bátran!",
+                    )
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://instagram.com/wholesomewarestuff".toUri()
+                                )
+                            )
+                        },
+                    ) {
+                        Text(text = "WholesomeWare Insta")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://m.me/CsakiTheOne".toUri()
+                                )
+                            )
+                        },
+                    ) {
+                        Text(text = "Messenger üzenet Csákinak")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    "mailto:jockahun@gmail.com".toUri()
+                                ).apply {
+                                    putExtra(
+                                        Intent.EXTRA_SUBJECT,
+                                        "WholesomeWare alkotás beküldése"
+                                    )
+                                }
+                            )
+                        },
+                    ) {
+                        Text(text = "E-mail küldése")
+                    }
+                }
+            }
         }
     }
 

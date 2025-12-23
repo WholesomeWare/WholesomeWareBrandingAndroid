@@ -2,19 +2,19 @@
     <string name="app_name">WholesomeWare</string>
 
     <string name="kolora_feszt_analog_clock_wallpaper_name">Kolora Feszt óra by Csáki</string>
-    <string name="kolora_feszt_analog_clock_wallpaper_description">An analog clock wallpaper based on the poster of the first Kolora Feszt event.</string>
+    <string name="kolora_feszt_analog_clock_wallpaper_description">Analóg óra az első Kolora Feszt rendezvény plakátja alapján.</string>
 
     <string name="d20_wallpaper_name">D20 by Csáki</string>
-    <string name="d20_wallpaper_description">A wallpaper featuring a D20 die.</string>
+    <string name="d20_wallpaper_description">Háttérkép egy D20 kockával.</string>
 
     <string name="template_wallpaper_name">Minta</string>
-    <string name="template_wallpaper_description">A wallpaper to make creating new wallpapers easier.</string>
+    <string name="template_wallpaper_description">Háttérkép, amely megkönnyíti új hátterképek készítését.</string>
 
     <string name="helka_free_flight_dive_wallpaper_name">szabad repülés - szabad merülés by Helka</string>
-    <string name="helka_free_flight_dive_wallpaper_description">A wallpaper featuring Helka\'s two singles.</string>
+    <string name="helka_free_flight_dive_wallpaper_description">Háttérkép Helka két kislemezével.</string>
 
     <string name="lighthouse_wallpaper_name">Világítótorony by M. Lia</string>
-    <string name="lighthouse_wallpaper_description">A lighthouse wallpaper with light in the dark and birds flying in light.</string>
+    <string name="lighthouse_wallpaper_description">Világítótorony háttérkép fénnyel a sötétben és madarakkal a fényben.</string>
 
-    <string name="darts_helper_widget_description">Calculate the least number of throws needed to win in darts.</string>
+    <string name="darts_helper_widget_description">Számítsd ki a legkevesebb dobás számát a nyeréshez dartsban.</string>
 </resources>

@@ -9,10 +9,13 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
 import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
+import com.csakitheone.wholesomeware.widget.DartsHelperWidget
+import com.csakitheone.wholesomeware.widget.DartsHelperWidgetReceiver
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
 import kotlinx.coroutines.GlobalScope
@@ -70,7 +73,7 @@ data class WallpaperArtwork(
     }
 }
 
-data class WidgetArtwork<T>(
+data class WidgetArtwork<T : GlanceAppWidgetReceiver>(
     override val title: String,
     override val artist: Artist,
     override val description: String = "",
@@ -96,8 +99,8 @@ data class WidgetArtwork<T>(
 
         GlobalScope.launch {
             GlanceAppWidgetManager(context).requestPinGlanceAppWidget(
-                receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
-                preview = KoloraFesztAnalogClockWidget(),
+                receiver = receiver,
+                preview = widget,
             )
         }
     }
@@ -161,6 +164,14 @@ fun getArtworks(context: Context): List<Artwork> {
             tags = listOf("kolora"),
             receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
             widget = KoloraFesztAnalogClockWidget(),
+        ),
+        WidgetArtwork(
+            title = "Darts: legkevesebb dobás számláló",
+            artist = ARTIST_CSAKI,
+            description = "Számítsd ki, hogy hány dobással tudsz nyerni dartsban.",
+            tags = listOf("játék"),
+            receiver = DartsHelperWidgetReceiver::class.java,
+            widget = DartsHelperWidget(),
         ),
     )
 }

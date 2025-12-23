@@ -15,4 +15,6 @@
 
     <string name="lighthouse_wallpaper_name">Világítótorony by M. Lia</string>
     <string name="lighthouse_wallpaper_description">A lighthouse wallpaper with light in the dark and birds flying in light.</string>
+
+    <string name="darts_helper_widget_description">Calculate the least number of throws needed to win in darts.</string>
 </resources>

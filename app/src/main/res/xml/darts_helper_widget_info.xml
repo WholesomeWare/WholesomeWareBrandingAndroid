@@ -1,10 +1,12 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/darts_helper_widget_description"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:maxResizeWidth="350dp"
-    android:maxResizeHeight="320dp"
-    android:minWidth="40dp"
-    android:minHeight="40dp"
+    android:maxResizeHeight="350dp"
+    android:minWidth="250dp"
+    android:minHeight="200dp"
     android:resizeMode="horizontal|vertical"
-    android:targetCellWidth="2"
+    android:targetCellWidth="4"
     android:targetCellHeight="2"
     android:widgetCategory="home_screen" />
+

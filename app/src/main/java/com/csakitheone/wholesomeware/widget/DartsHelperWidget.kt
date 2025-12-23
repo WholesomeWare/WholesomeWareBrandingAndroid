@@ -195,11 +195,7 @@ class NumberInputAction : ActionCallback {
         val number = parameters[NUMBER_PARAM] ?: return
         updateAppWidgetState(context, glanceId) { prefs ->
             val currentScore = prefs[SCORE_KEY] ?: ""
-            val newScore = if (currentScore.length < 4) {
-                currentScore + number.toString()
-            } else {
-                currentScore
-            }
+            val newScore = (currentScore + number.toString()).take(3)
             prefs[SCORE_KEY] = newScore
         }
         DartsHelperWidget().update(context, glanceId)

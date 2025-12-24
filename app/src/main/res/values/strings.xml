@@ -17,4 +17,5 @@
     <string name="lighthouse_wallpaper_description">Világítótorony háttérkép fénnyel a sötétben és madarakkal a fényben.</string>
 
     <string name="darts_helper_widget_description">Számítsd ki a legkevesebb dobás számát a nyeréshez dartsban.</string>
+    <string name="title_activity_radio_experiment">RadioExperimentActivity</string>
 </resources>

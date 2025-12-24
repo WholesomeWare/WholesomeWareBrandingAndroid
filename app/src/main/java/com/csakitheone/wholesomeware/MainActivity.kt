@@ -102,6 +102,7 @@ import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
 import com.csakitheone.wholesomeware.experiment.DartsHelper
 import com.csakitheone.wholesomeware.experiment.NetworkUtils
+import com.csakitheone.wholesomeware.experiment.RadioExperimentActivity
 import com.csakitheone.wholesomeware.model.Artwork
 import com.csakitheone.wholesomeware.model.WallpaperArtwork
 import com.csakitheone.wholesomeware.model.WidgetArtwork
@@ -115,25 +116,11 @@ import java.net.URL
 import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
-    private var radioService: RadioService? = null
-    private var isServiceBound = false
 
     private val TAB_HOME = "home"
     private val TAB_ARTWORKS = "artworks"
     private val TAB_EXPERIMENTS = "experiments"
 
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as RadioService.RadioBinder
-            radioService = binder.getService()
-            isServiceBound = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            radioService = null
-            isServiceBound = false
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,20 +131,6 @@ class MainActivity : ComponentActivity() {
         }
 
         askNotifyPermission()
-        bindRadioService()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isServiceBound) {
-            unbindService(serviceConnection)
-            isServiceBound = false
-        }
-    }
-
-    private fun bindRadioService() {
-        val intent = Intent(this, RadioService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     private fun askNotifyPermission() {
@@ -744,36 +717,6 @@ class MainActivity : ComponentActivity() {
     private fun TabExperiments(
         modifier: Modifier = Modifier,
     ) {
-        val coroutineScope = rememberCoroutineScope()
-
-        var isPlaying by remember { mutableStateOf(false) }
-        var radioNowPlaying by remember { mutableStateOf<String?>(null) }
-
-        LaunchedEffect(Unit) {
-            NetworkUtils.disableSSLCertificateVerify()
-        }
-
-        LaunchedEffect(radioService) {
-            isPlaying = radioService?.isPlaying() == true
-        }
-
-        fun refreshRadioMetadata() {
-            radioNowPlaying = "Betöltés..."
-            val url = "https://cloudfront41.lexanetwork.com:7604"
-            coroutineScope.launch(Dispatchers.IO) {
-                try {
-                    val text =
-                        String(URL(url).readText().toByteArray(Charsets.ISO_8859_1), Charsets.UTF_8)
-                    radioNowPlaying = text
-                        .substringAfter("Current Song:")
-                        .substringAfter("streamdata\">")
-                        .substringBefore("<").trim()
-                } catch (e: Exception) {
-                    Log.e("MainActivity", "Error fetching radio metadata", e)
-                }
-            }
-        }
-
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
             ElevatedCard(
                 shape = WWMenuDefaults.cardSingleItemShape(),
@@ -784,119 +727,15 @@ class MainActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            title("Rádió", "\"Rádióban épp most szóló zenét meg lehet nyitni Spotify-ban?\"")
-            ElevatedCard(
-                shape = WWMenuDefaults.cardFirstItemShape()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = "Vörösmarty Rádió",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Row {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = radioNowPlaying ?: "A rádió műsora még nem lett lekérve.",
-                        )
-                        IconButton(
-                            onClick = { refreshRadioMetadata() }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_refresh),
-                                contentDescription = null,
-                            )
-                        }
-                    }
-                    Box(
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularWavyProgressIndicator(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .alpha(if (isPlaying) 1f else 0f),
-                        )
-                        ToggleFloatingActionButton(
-                            checked = isPlaying,
-                            onCheckedChange = { isChecked ->
-                                if (isChecked) {
-                                    val streamUrl =
-                                        "https://cloudfront41.lexanetwork.com:7604/livestream.mp3"
-                                    val intent =
-                                        Intent(this@MainActivity, RadioService::class.java).apply {
-                                            action = RadioService.ACTION_PLAY
-                                            putExtra(RadioService.EXTRA_STREAM_URL, streamUrl)
-                                            putExtra(
-                                                RadioService.EXTRA_STREAM_TITLE,
-                                                "Vörösmarty Rádió"
-                                            )
-                                        }
-                                    startService(intent)
-                                    isPlaying = true
-                                    refreshRadioMetadata()
-                                } else {
-                                    val intent =
-                                        Intent(this@MainActivity, RadioService::class.java).apply {
-                                            action = RadioService.ACTION_PAUSE
-                                        }
-                                    startService(intent)
-                                    isPlaying = false
-                                }
-                            },
-                        ) {
-                            Icon(
-                                painter = painterResource(
-                                    if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
-                                ),
-                                contentDescription = null,
-                                tint = ToggleFloatingActionButtonDefaults.iconColor()(if (isPlaying) 1f else 0f),
-                            )
-                        }
-                    }
-                }
-            }
-            WWMenuDefaults.itemsSpacer()
+            title("Kísérletek")
             items(
                 MenuScope.ItemInfo(
-                    shapeOverride = WWMenuDefaults.cardMiddleItemShape(),
-                    enabled = radioNowPlaying != null && radioNowPlaying!!.contains(" - "),
-                    onClick = {
-                        val artist = radioNowPlaying!!.substringBefore(" - ").trim()
-                        val title = radioNowPlaying!!.substringAfter(" - ").trim()
-
-                        startActivity(
-                            Intent.createChooser(
-                                Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)
-                                    .putExtra(
-                                        MediaStore.EXTRA_MEDIA_FOCUS,
-                                        "vnd.android.cursor.item/audio"
-                                    )
-                                    .putExtra(SearchManager.QUERY, "$artist $title"),
-                                    //.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, artist)
-                                    //.putExtra(MediaStore.EXTRA_MEDIA_TITLE, title),
-                                "Lejátszás ezzel..."
-                            )
-                        )
-                    },
-                    title = "Keresés és lejátszás Intent küldése",
-                    description = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH,
-                ),
-                MenuScope.ItemInfo(
                     onClick = {
                         startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                "https://cloudfront41.lexanetwork.com:7604".toUri()
-                            )
+                            Intent(this@MainActivity, RadioExperimentActivity::class.java)
                         )
                     },
-                    title = "Rádió metaadatok forrása",
-                    description = "https://cloudfront41.lexanetwork.com:7604",
+                    title = "Rádió most játszott megnyitása Spotify-ban",
                 ),
             )
             /*items(

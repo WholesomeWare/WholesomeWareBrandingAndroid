@@ -106,6 +106,20 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/lighthouse_wallpaper" />
         </service>
+        <service
+            android:name=".wallpaper.SkeletonSwingWallpaperService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/skeleton_swing_wallpaper_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/skeleton_swing_wallpaper" />
+        </service>
 
         <receiver
             android:name=".widget.KoloraFesztAnalogClockWidgetReceiver"

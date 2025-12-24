@@ -14,6 +14,7 @@ import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
 import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
+import com.csakitheone.wholesomeware.wallpaper.SkeletonSwingWallpaperService
 import com.csakitheone.wholesomeware.widget.DartsHelperWidget
 import com.csakitheone.wholesomeware.widget.DartsHelperWidgetReceiver
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
@@ -153,6 +154,15 @@ fun getArtworks(context: Context): List<Artwork> {
             componentName = ComponentName(
                 context,
                 LighthouseWallpaperService::class.java
+            ),
+        ),
+        WallpaperArtwork(
+            title = "Hintázó csontváz",
+            artist = ARTIST_CSAKI,
+            description = "Egy csontváz lassan hintázik a sötétben.",
+            componentName = ComponentName(
+                context,
+                SkeletonSwingWallpaperService::class.java
             ),
         ),
 

@@ -612,6 +612,12 @@ class MainActivity : ComponentActivity() {
                         },
                         title = artwork.title,
                         description = "by ${artwork.artist} ${artwork.tags.joinToString { "#$it" }}",
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_image),
+                                contentDescription = null,
+                            )
+                        },
                         trailingIcon = {
                             IconButton(
                                 onClick = { selectedArtwork = artwork }
@@ -638,6 +644,12 @@ class MainActivity : ComponentActivity() {
                         },
                         title = artwork.title,
                         description = "by ${artwork.artist} ${artwork.tags.joinToString { "#$it" }}",
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_widgets),
+                                contentDescription = null,
+                            )
+                        },
                         trailingIcon = {
                             IconButton(
                                 onClick = { selectedArtwork = artwork }

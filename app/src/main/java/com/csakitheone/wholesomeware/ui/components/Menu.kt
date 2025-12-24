@@ -90,12 +90,22 @@ class MenuScope {
     @Composable
     fun title(
         text: String,
+        subtitle: String? = null,
     ) {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-        )
+        Column(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            if (!subtitle.isNullOrBlank()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            }
+        }
     }
 
     @Composable

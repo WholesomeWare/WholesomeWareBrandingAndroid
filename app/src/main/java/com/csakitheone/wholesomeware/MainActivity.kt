@@ -271,7 +271,8 @@ class MainActivity : ComponentActivity() {
                                 actions = {
                                     FilledIconButton(
                                         onClick = {
-                                            val shareLink = "https://play.google.com/store/apps/details?id=com.csakitheone.wholesomeware"
+                                            val shareLink =
+                                                "https://play.google.com/store/apps/details?id=com.csakitheone.wholesomeware"
                                             startActivity(
                                                 Intent.createChooser(
                                                     Intent(Intent.ACTION_SEND).apply {
@@ -747,9 +748,6 @@ class MainActivity : ComponentActivity() {
         var isPlaying by remember { mutableStateOf(false) }
         var radioNowPlaying by remember { mutableStateOf<String?>(null) }
 
-        var isEventRecommendationDialogOpen by remember { mutableStateOf(false) }
-        var eventRecommendationSummary by remember { mutableStateOf<String?>(null) }
-
         LaunchedEffect(Unit) {
             NetworkUtils.disableSSLCertificateVerify()
         }
@@ -776,7 +774,16 @@ class MainActivity : ComponentActivity() {
         }
 
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
-            title("Rádió")
+            ElevatedCard(
+                shape = WWMenuDefaults.cardSingleItemShape(),
+            ) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = "Ha egy barátomnak vagy nekem jön egy ötlet, amit ki szeretnénk próbálni, de fölösleges egy külön alkalmazást készíteni hozzá, akkor ide kerülnek.",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            title("Rádió", "\"Rádióban épp most szóló zenét meg lehet nyitni Spotify-ban?\" - Dani")
             ElevatedCard(
                 shape = WWMenuDefaults.cardFirstItemShape()
             ) {
@@ -855,7 +862,7 @@ class MainActivity : ComponentActivity() {
             WWMenuDefaults.itemsSpacer()
             items(
                 MenuScope.ItemInfo(
-                    shapeOverride = WWMenuDefaults.cardLastItemShape(),
+                    shapeOverride = WWMenuDefaults.cardMiddleItemShape(),
                     enabled = radioNowPlaying != null && radioNowPlaying!!.contains(" - "),
                     onClick = {
                         val artist = radioNowPlaying!!.substringBefore(" - ").trim()
@@ -868,18 +875,29 @@ class MainActivity : ComponentActivity() {
                                         MediaStore.EXTRA_MEDIA_FOCUS,
                                         "vnd.android.cursor.item/audio"
                                     )
-                                    .putExtra(SearchManager.QUERY, "$artist - $title")
-                                    .putExtra(MediaStore.EXTRA_MEDIA_ARTIST, artist)
-                                    .putExtra(MediaStore.EXTRA_MEDIA_TITLE, title),
+                                    .putExtra(SearchManager.QUERY, "$artist $title"),
+                                    //.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, artist)
+                                    //.putExtra(MediaStore.EXTRA_MEDIA_TITLE, title),
                                 "Lejátszás ezzel..."
                             )
                         )
                     },
-                    title = "Intent: keresés és lejátszás (ha zene szól)",
+                    title = "Keresés és lejátszás Intent küldése",
                     description = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH,
                 ),
+                MenuScope.ItemInfo(
+                    onClick = {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                "https://cloudfront41.lexanetwork.com:7604".toUri()
+                            )
+                        )
+                    },
+                    title = "Rádió metaadatok forrása",
+                    description = "https://cloudfront41.lexanetwork.com:7604",
+                ),
             )
-            title("További kísérletek hamarosan...")
             /*items(
                 MenuScope.ItemInfo(
                     onClick = { isEventRecommendationDialogOpen = true },

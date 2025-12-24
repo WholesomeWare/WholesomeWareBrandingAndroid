@@ -155,6 +155,7 @@ fun getArtworks(context: Context): List<Artwork> {
                 LighthouseWallpaperService::class.java
             ),
         ),
+
         WidgetArtwork(
             title = "Kolora Feszt óra",
             artist = ARTIST_CSAKI,
@@ -169,7 +170,6 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "Darts: legkevesebb dobás számláló",
             artist = ARTIST_CSAKI,
             description = "Számítsd ki, hogy hány dobással tudsz nyerni dartsban.",
-            tags = listOf("játék"),
             receiver = DartsHelperWidgetReceiver::class.java,
             widget = DartsHelperWidget(),
         ),

@@ -455,7 +455,7 @@ class MainActivity : ComponentActivity() {
             items(
                 MenuScope.ItemInfo(
                     onClick = { onTabChangeRequest(TAB_ARTWORKS) },
-                    title = "Alkotások (${getArtworks(context).size})",
+                    title = "Alkotások",
                     description = "Élő hátterek és widget-ek",
                     leadingIcon = {
                         Icon(
@@ -688,6 +688,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Text(
                         text = "Ha van ötleted, rajzod, grafikád vagy bármi, amiből élő hátteret vagy widget-et lehetne készíteni, keress bátran!",
+                        style = MaterialTheme.typography.bodySmall,
                     )
                     OutlinedButton(
                         modifier = Modifier.fillMaxWidth(),
@@ -783,7 +784,7 @@ class MainActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            title("Rádió", "\"Rádióban épp most szóló zenét meg lehet nyitni Spotify-ban?\" - Dani")
+            title("Rádió", "\"Rádióban épp most szóló zenét meg lehet nyitni Spotify-ban?\"")
             ElevatedCard(
                 shape = WWMenuDefaults.cardFirstItemShape()
             ) {

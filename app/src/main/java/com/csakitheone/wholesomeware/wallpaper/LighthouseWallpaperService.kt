@@ -1,6 +1,8 @@
 package com.csakitheone.wholesomeware.wallpaper
 
 import android.app.WallpaperColors
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -12,7 +14,6 @@ import android.os.Looper
 import android.os.PowerManager
 import android.service.wallpaper.WallpaperService
 import android.util.Log
-import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toBitmap
@@ -36,6 +37,8 @@ class LighthouseWallpaperService : WallpaperService() {
             private lateinit var birdsBitmap: Bitmap
 
             private var birdsX = Float.NEGATIVE_INFINITY
+            private var batteryPercentage = 100
+            private var isCharging = false
 
             //
             // Helper functions
@@ -84,11 +87,28 @@ class LighthouseWallpaperService : WallpaperService() {
             private val drawRunnable = object : Runnable {
                 override fun run() {
                     val framerate = if (powerManager.isPowerSaveMode) 30 else 120
+                    updateBatteryInfo()
                     draw(1000L / framerate)
                     if (visible) {
                         handler.postDelayed(this, 1000L / framerate)
                     }
                 }
+            }
+
+            private fun updateBatteryInfo() {
+                val batteryStatus = registerReceiver(
+                    null,
+                    IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+                )
+                val level = batteryStatus?.getIntExtra("level", -1) ?: -1
+                val scale = batteryStatus?.getIntExtra("scale", -1) ?: -1
+                batteryPercentage = if (level != -1 && scale != -1) {
+                    (level * 100) / scale
+                } else {
+                    -1
+                }
+                val status = batteryStatus?.getIntExtra("status", -1) ?: -1
+                isCharging = status == 2 || status == 5 // BATTERY_STATUS_CHARGING || BATTERY_STATUS_FULL
             }
 
             //
@@ -199,11 +219,15 @@ class LighthouseWallpaperService : WallpaperService() {
 
                 if (isDarkMode) {
                     // Light
+                    val lightPaint = Paint().apply {
+                        alpha = if (isCharging) 255
+                        else (batteryPercentage * 2.55f).toInt().coerceIn(0, 255)
+                    }
                     canvas.drawBitmap(
                         lighthouseLightBitmap,
                         centerX - lighthouseLightBitmap.width / 2f,
                         (centerY + height / 4f) - lighthouseLightBitmap.height * .7f,
-                        null
+                        lightPaint
                     )
                     birdsX = canvas.width.toFloat()
                 } else {

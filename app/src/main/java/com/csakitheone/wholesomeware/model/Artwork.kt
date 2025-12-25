@@ -119,6 +119,15 @@ fun getArtworks(context: Context): List<Artwork> {
             ),
         ),
         WallpaperArtwork(
+            title = "Hintázó csontváz",
+            artist = ARTIST_CSAKI,
+            description = "Egy csontváz lassan hintázik a sötétben.",
+            componentName = ComponentName(
+                context,
+                SkeletonSwingWallpaperService::class.java
+            ),
+        ),
+        WallpaperArtwork(
             title = "Kolora Feszt óra",
             artist = ARTIST_CSAKI,
             description = "Analóg óra a 2025-ös Kolora Feszt plakátja stílusában.",
@@ -156,16 +165,14 @@ fun getArtworks(context: Context): List<Artwork> {
                 LighthouseWallpaperService::class.java
             ),
         ),
-        WallpaperArtwork(
-            title = "Hintázó csontváz",
-            artist = ARTIST_CSAKI,
-            description = "Egy csontváz lassan hintázik a sötétben.",
-            componentName = ComponentName(
-                context,
-                SkeletonSwingWallpaperService::class.java
-            ),
-        ),
 
+        WidgetArtwork(
+            title = "Darts: legkevesebb dobás számláló",
+            artist = ARTIST_CSAKI,
+            description = "Számítsd ki, hogy hány dobással tudsz nyerni dartsban.",
+            receiver = DartsHelperWidgetReceiver::class.java,
+            widget = DartsHelperWidget(),
+        ),
         WidgetArtwork(
             title = "Kolora Feszt óra",
             artist = ARTIST_CSAKI,
@@ -175,13 +182,6 @@ fun getArtworks(context: Context): List<Artwork> {
             tags = listOf("kolora"),
             receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
             widget = KoloraFesztAnalogClockWidget(),
-        ),
-        WidgetArtwork(
-            title = "Darts: legkevesebb dobás számláló",
-            artist = ARTIST_CSAKI,
-            description = "Számítsd ki, hogy hány dobással tudsz nyerni dartsban.",
-            receiver = DartsHelperWidgetReceiver::class.java,
-            widget = DartsHelperWidget(),
         ),
     )
 }

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import com.csakitheone.wholesomeware.R
 import com.csakitheone.wholesomeware.wallpaper.D20WallpaperService
 import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
@@ -27,6 +28,7 @@ interface Artwork {
     val title: String
     val artist: Artist
     val description: String
+    val previewDrawableResource: Int?
     val unlockDescription: String
     val unlockData: String
     val tags: List<String>
@@ -37,6 +39,7 @@ data class WallpaperArtwork(
     override val title: String,
     override val artist: Artist,
     override val description: String = "",
+    override val previewDrawableResource: Int? = null,
     override val unlockDescription: String = "",
     override val unlockData: String = "",
     override val tags: List<String> = emptyList(),
@@ -78,6 +81,7 @@ data class WidgetArtwork<T : GlanceAppWidgetReceiver>(
     override val title: String,
     override val artist: Artist,
     override val description: String = "",
+    override val previewDrawableResource: Int? = null,
     override val unlockDescription: String = "",
     override val unlockData: String = "",
     override val tags: List<String> = emptyList(),
@@ -122,6 +126,7 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "Hintázó csontváz",
             artist = ARTIST_UNKNOWN,
             description = "Egy csontváz lassan hintázik a sötétben.",
+            previewDrawableResource = R.drawable.skeleton_swing,
             componentName = ComponentName(
                 context,
                 SkeletonSwingWallpaperService::class.java
@@ -143,6 +148,7 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "szabad repülés - szabad merülés",
             artist = ARTIST_HELKA,
             description = "Helka két kislemez borítójából készült grafika.",
+            previewDrawableResource = R.drawable.helka_szabad_repules_merules,
             unlockDescription = "Feloldáshoz látogasd meg Helka weboldalát.",
             unlockData = "https://www.helkamusic.hu/",
             tags = listOf("rajz"),
@@ -159,6 +165,7 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "Világítótorony",
             artist = ARTIST_M_LIA,
             description = "Fények a sötétben és repülő madarak a világosban.",
+            previewDrawableResource = R.drawable.lighthouse_original,
             tags = listOf("rajz"),
             componentName = ComponentName(
                 context,

@@ -475,6 +475,7 @@ class MainActivity : ComponentActivity() {
                             contentDescription = null,
                         )
                     },
+                    backgroundImage = painterResource(R.drawable.kolora_banner),
                 )
             )
         }
@@ -628,6 +629,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         },
+                        backgroundImage = artwork.previewDrawableResource?.let { painterResource(it) },
                     )
                 }
             )
@@ -660,6 +662,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         },
+                        backgroundImage = artwork.previewDrawableResource?.let { painterResource(it) },
                     )
                 }
             )
@@ -747,7 +750,7 @@ class MainActivity : ComponentActivity() {
                             Intent(this@MainActivity, RadioExperimentActivity::class.java)
                         )
                     },
-                    title = "Rádió most játszott megnyitása Spotify-ban",
+                    title = "Rádió most játszott megnyitása zenelejátszó appban",
                 ),
             )
             /*items(

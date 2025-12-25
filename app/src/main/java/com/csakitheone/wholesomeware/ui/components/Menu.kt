@@ -1,12 +1,16 @@
 package com.csakitheone.wholesomeware.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
@@ -85,6 +91,7 @@ class MenuScope {
         val leadingIcon: @Composable (RowScope.() -> Unit)? = null,
         val trailingIcon: @Composable (RowScope.() -> Unit)? = null,
         val shapeOverride: Shape? = null,
+        val backgroundImage: Painter? = null,
     )
 
     @Composable
@@ -93,7 +100,9 @@ class MenuScope {
         subtitle: String? = null,
     ) {
         Column(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
         ) {
             Text(
                 text = text,
@@ -138,27 +147,40 @@ class MenuScope {
                         else -> WWMenuDefaults.cardMiddleItemShape()
                     },
                 ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        items[i].leadingIcon?.invoke(this)
-                        Column(
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text(text = items[i].title)
-                            if (!items[i].description.isNullOrBlank()) {
-                                Text(
-                                    modifier = Modifier.alpha(.6f),
-                                    text = items[i].description ?: "",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
+                    Box {
+                        if (items[i].backgroundImage != null) {
+                            Image(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .fillMaxWidth()
+                                    .alpha(.2f),
+                                painter = items[i].backgroundImage!!,
+                                contentDescription = null,
+                                contentScale = ContentScale.FillWidth,
+                            )
                         }
-                        items[i].trailingIcon?.invoke(this)
+                        Row(
+                            modifier = Modifier.padding(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            items[i].leadingIcon?.invoke(this)
+                            Column(
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text(text = items[i].title)
+                                if (!items[i].description.isNullOrBlank()) {
+                                    Text(
+                                        modifier = Modifier.alpha(.6f),
+                                        text = items[i].description ?: "",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
+                            }
+                            items[i].trailingIcon?.invoke(this)
+                        }
                     }
                 }
             }

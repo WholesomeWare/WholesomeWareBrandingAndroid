@@ -28,3 +28,7 @@ val ARTIST_HELKA = Artist(
 val ARTIST_M_LIA = Artist(
     name = "M. Lia",
 )
+
+val ARTIST_UNKNOWN = Artist(
+    name = "Ismeretlen",
+)

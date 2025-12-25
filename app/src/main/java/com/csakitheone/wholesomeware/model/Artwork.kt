@@ -120,7 +120,7 @@ fun getArtworks(context: Context): List<Artwork> {
         ),
         WallpaperArtwork(
             title = "Hintázó csontváz",
-            artist = ARTIST_CSAKI,
+            artist = ARTIST_UNKNOWN,
             description = "Egy csontváz lassan hintázik a sötétben.",
             componentName = ComponentName(
                 context,

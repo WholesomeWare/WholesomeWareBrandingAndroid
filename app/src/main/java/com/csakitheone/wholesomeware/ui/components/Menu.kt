@@ -153,7 +153,7 @@ class MenuScope {
                                 modifier = Modifier
                                     .matchParentSize()
                                     .fillMaxWidth()
-                                    .alpha(.2f),
+                                    .alpha(.4f),
                                 painter = items[i].backgroundImage!!,
                                 contentDescription = null,
                                 contentScale = ContentScale.FillWidth,

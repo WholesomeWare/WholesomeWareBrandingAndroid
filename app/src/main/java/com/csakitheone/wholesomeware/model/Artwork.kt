@@ -126,7 +126,7 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "Hintázó csontváz",
             artist = ARTIST_UNKNOWN,
             description = "Egy csontváz lassan hintázik a sötétben.",
-            previewDrawableResource = R.drawable.skeleton_swing,
+            previewDrawableResource = R.drawable.skeleton_swing_foreground,
             componentName = ComponentName(
                 context,
                 SkeletonSwingWallpaperService::class.java
@@ -165,7 +165,7 @@ fun getArtworks(context: Context): List<Artwork> {
             title = "Világítótorony",
             artist = ARTIST_M_LIA,
             description = "Fények a sötétben és repülő madarak a világosban.",
-            previewDrawableResource = R.drawable.lighthouse_original,
+            previewDrawableResource = R.drawable.lighthouse_layer_tower,
             tags = listOf("rajz"),
             componentName = ComponentName(
                 context,

@@ -456,6 +456,13 @@ class MainActivity : ComponentActivity() {
                             contentDescription = null,
                         )
                     },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_open_in_new),
+                            contentDescription = null
+                        )
+                    },
+                    backgroundImage = painterResource(R.drawable.wholesomeware_banner_notext),
                 ),
                 MenuScope.ItemInfo(
                     onClick = {
@@ -473,6 +480,12 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.size(24.dp),
                             painter = painterResource(id = R.drawable.ic_kolora),
                             contentDescription = null,
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_open_in_new),
+                            contentDescription = null
                         )
                     },
                     backgroundImage = painterResource(R.drawable.kolora_banner),

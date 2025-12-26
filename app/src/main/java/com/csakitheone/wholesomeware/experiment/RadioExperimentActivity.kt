@@ -49,6 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -111,15 +112,7 @@ class RadioExperimentActivity : ComponentActivity() {
             val coroutineScope = rememberCoroutineScope()
 
             var isPlaying by remember { mutableStateOf(false) }
-            var radioNowPlaying by remember { mutableStateOf<String?>(null) }
-
-            LaunchedEffect(Unit) {
-                NetworkUtils.disableSSLCertificateVerify()
-            }
-
-            LaunchedEffect(radioService) {
-                isPlaying = radioService?.isPlaying() == true
-            }
+            var radioNowPlaying by rememberSaveable { mutableStateOf<String?>(null) }
 
             fun refreshRadioMetadata() {
                 radioNowPlaying = "Betöltés..."
@@ -139,6 +132,15 @@ class RadioExperimentActivity : ComponentActivity() {
                         Log.e("RadioExperimentActivity", "Error fetching radio metadata", e)
                     }
                 }
+            }
+
+            LaunchedEffect(Unit) {
+                NetworkUtils.disableSSLCertificateVerify()
+                refreshRadioMetadata()
+            }
+
+            LaunchedEffect(radioService) {
+                isPlaying = radioService?.isPlaying() == true
             }
 
             Surface(
@@ -167,11 +169,12 @@ class RadioExperimentActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        ElevatedCard {
+                        ElevatedCard(
+                            modifier = Modifier.widthIn(max = 320.dp),
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .widthIn(max = 400.dp)
                                     .aspectRatio(1f),
                                 contentAlignment = Alignment.Center,
                             ) {
@@ -283,6 +286,12 @@ class RadioExperimentActivity : ComponentActivity() {
                                     },
                                     title = "Rádió metaadatok forrása",
                                     description = "https://cloudfront41.lexanetwork.com:7604",
+                                    trailingIcon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_open_in_new),
+                                            contentDescription = null
+                                        )
+                                    },
                                 ),
                             )
                         }

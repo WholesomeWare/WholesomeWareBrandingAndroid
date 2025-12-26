@@ -18,6 +18,8 @@ import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.SkeletonSwingWallpaperService
 import com.csakitheone.wholesomeware.widget.DartsHelperWidget
 import com.csakitheone.wholesomeware.widget.DartsHelperWidgetReceiver
+import com.csakitheone.wholesomeware.widget.FluidIntakeTrackerWidget
+import com.csakitheone.wholesomeware.widget.FluidIntakeTrackerWidgetReceiver
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidgetReceiver
 import kotlinx.coroutines.GlobalScope
@@ -179,6 +181,13 @@ fun getArtworks(context: Context): List<Artwork> {
             description = "Számítsd ki, hogy hány dobással tudsz nyerni dartsban.",
             receiver = DartsHelperWidgetReceiver::class.java,
             widget = DartsHelperWidget(),
+        ),
+        WidgetArtwork(
+            title = "Folyadékbevitel naplózó",
+            artist = ARTIST_CSAKI,
+            description = "Kövesd nyomon a napi folyadékfogyasztásodat.",
+            receiver = FluidIntakeTrackerWidgetReceiver::class.java,
+            widget = FluidIntakeTrackerWidget(),
         ),
         WidgetArtwork(
             title = "Kolora Feszt óra",

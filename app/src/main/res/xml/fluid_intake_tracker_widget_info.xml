@@ -1,0 +1,13 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/fluid_intake_tracker_widget_description"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:maxResizeWidth="400dp"
+    android:maxResizeHeight="300dp"
+    android:minWidth="200dp"
+    android:minHeight="200dp"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="3"
+    android:targetCellHeight="2"
+    android:widgetCategory="home_screen"
+    android:updatePeriodMillis="0" />
+

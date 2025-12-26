@@ -151,7 +151,7 @@ fun getArtworks(context: Context): List<Artwork> {
             previewDrawableResource = R.drawable.helka_szabad_repules_merules,
             unlockDescription = "Feloldáshoz látogasd meg Helka weboldalát.",
             unlockData = "https://www.helkamusic.hu/",
-            tags = listOf("rajz"),
+            tags = listOf("rajz", "zene"),
             permissions = listOf(
                 android.Manifest.permission.RECORD_AUDIO,
                 android.Manifest.permission.MODIFY_AUDIO_SETTINGS,

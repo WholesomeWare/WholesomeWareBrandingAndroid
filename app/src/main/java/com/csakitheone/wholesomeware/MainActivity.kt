@@ -498,14 +498,15 @@ class MainActivity : ComponentActivity() {
     private fun TabArtworks(
         modifier: Modifier = Modifier,
     ) {
-        val activity = LocalActivity.current!!
-        val artworks = remember { getArtworks(activity) }
+        val context = LocalContext.current
+        val activity = LocalActivity.current
+        val artworks = remember { getArtworks(context) }
 
         var selectedArtwork by remember { mutableStateOf<Artwork?>(null) }
         val isSelectedArtworkUnlocked by remember {
             derivedStateOf {
                 if (selectedArtwork == null) return@derivedStateOf false
-                UserSettings.isArtworkUnlocked(activity, selectedArtwork!!.unlockData)
+                UserSettings.isArtworkUnlocked(context, selectedArtwork!!.unlockData)
             }
         }
 
@@ -554,7 +555,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
                                     UserSettings.lockArtwork(
-                                        activity,
+                                        context,
                                         selectedArtwork!!.unlockData
                                     )
                                     selectedArtwork = null
@@ -585,12 +586,14 @@ class MainActivity : ComponentActivity() {
                                     Intent(Intent.ACTION_VIEW, selectedArtwork!!.unlockData.toUri())
                                 )
                                 UserSettings.unlockArtwork(
-                                    activity,
+                                    context,
                                     selectedArtwork!!.unlockData
                                 )
                                 selectedArtwork = null
                                 return@Button
                             }
+
+                            if (activity == null) return@Button
 
                             selectedArtwork!!.let { artwork ->
                                 when (artwork) {
@@ -618,10 +621,13 @@ class MainActivity : ComponentActivity() {
                 artworks.filter { it is WallpaperArtwork }.map { artwork ->
                     MenuScope.ItemInfo(
                         onClick = {
-                            if (!UserSettings.isArtworkUnlocked(activity, artwork.unlockData)) {
+                            if (!UserSettings.isArtworkUnlocked(context, artwork.unlockData)) {
                                 selectedArtwork = artwork
                                 return@ItemInfo
                             }
+
+                            if (activity == null) return@ItemInfo
+
                             (artwork as WallpaperArtwork).set(activity)
                         },
                         title = artwork.title,
@@ -651,10 +657,13 @@ class MainActivity : ComponentActivity() {
                 artworks.filter { it is WidgetArtwork<*> }.map { artwork ->
                     MenuScope.ItemInfo(
                         onClick = {
-                            if (!UserSettings.isArtworkUnlocked(activity, artwork.unlockData)) {
+                            if (!UserSettings.isArtworkUnlocked(context, artwork.unlockData)) {
                                 selectedArtwork = artwork
                                 return@ItemInfo
                             }
+
+                            if (activity == null) return@ItemInfo
+
                             (artwork as WidgetArtwork<*>).set(activity)
                         },
                         title = artwork.title,
@@ -745,6 +754,8 @@ class MainActivity : ComponentActivity() {
     private fun TabExperiments(
         modifier: Modifier = Modifier,
     ) {
+        val context = LocalContext.current
+
         Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
             ElevatedCard(
                 shape = WWMenuDefaults.cardSingleItemShape(),
@@ -760,7 +771,7 @@ class MainActivity : ComponentActivity() {
                 MenuScope.ItemInfo(
                     onClick = {
                         startActivity(
-                            Intent(this@MainActivity, RadioExperimentActivity::class.java)
+                            Intent(context, RadioExperimentActivity::class.java)
                         )
                     },
                     title = "Rádió most játszott megnyitása zenelejátszó appban",

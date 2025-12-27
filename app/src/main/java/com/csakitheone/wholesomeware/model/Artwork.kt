@@ -48,16 +48,16 @@ data class WallpaperArtwork(
     override val permissions: List<String> = emptyList(),
     val componentName: ComponentName,
 ) : Artwork {
-    fun set(context: Activity) {
+    fun set(activity: Activity) {
         val missingPermissions = permissions.filter {
             ContextCompat.checkSelfPermission(
-                context,
+                activity,
                 it
             ) != android.content.pm.PackageManager.PERMISSION_GRANTED
         }
 
         if (missingPermissions.isNotEmpty()) {
-            context.requestPermissions(permissions.toTypedArray(), abs(hashCode()))
+            activity.requestPermissions(permissions.toTypedArray(), abs(hashCode()))
             return
         }
 
@@ -68,10 +68,10 @@ data class WallpaperArtwork(
                 WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
                 componentName
             )
-            context.startActivity(intent)
+            activity.startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(
-                context,
+                activity,
                 "Error setting wallpaper: ${e.message}",
                 Toast.LENGTH_SHORT
             ).show()
@@ -91,21 +91,21 @@ data class WidgetArtwork<T : GlanceAppWidgetReceiver>(
     val receiver: Class<T>,
     val widget: GlanceAppWidget,
 ): Artwork {
-    fun set(context: Activity) {
+    fun set(activity: Activity) {
         val missingPermissions = permissions.filter {
             ContextCompat.checkSelfPermission(
-                context,
+                activity,
                 it
             ) != android.content.pm.PackageManager.PERMISSION_GRANTED
         }
 
         if (missingPermissions.isNotEmpty()) {
-            context.requestPermissions(permissions.toTypedArray(), abs(hashCode()))
+            activity.requestPermissions(permissions.toTypedArray(), abs(hashCode()))
             return
         }
 
         GlobalScope.launch {
-            GlanceAppWidgetManager(context).requestPinGlanceAppWidget(
+            GlanceAppWidgetManager(activity).requestPinGlanceAppWidget(
                 receiver = receiver,
                 preview = widget,
             )

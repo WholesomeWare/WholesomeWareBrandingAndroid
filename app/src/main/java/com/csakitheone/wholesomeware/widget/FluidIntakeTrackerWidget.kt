@@ -13,6 +13,7 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.IconImageProvider
 import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
@@ -68,16 +69,7 @@ class FluidIntakeTrackerWidgetReceiver : GlanceAppWidgetReceiver() {
 
 class FluidIntakeTrackerWidget : GlanceAppWidget() {
 
-    override val sizeMode: SizeMode = SizeMode.Responsive(
-        (2..4).flatMap { w ->
-            (2..3).map { h ->
-                DpSize(
-                    width = (w * 100).dp,
-                    height = (h * 100).dp,
-                )
-            }
-        }.toSet()
-    )
+    override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
@@ -114,12 +106,10 @@ class FluidIntakeTrackerWidget : GlanceAppWidget() {
                     .fillMaxSize()
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "💧 Folyadékbevitel követő",
                     style = TextStyle(
-                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = GlanceTheme.colors.onBackground,
                     ),
@@ -132,7 +122,9 @@ class FluidIntakeTrackerWidget : GlanceAppWidget() {
                     modifier = GlanceModifier.fillMaxWidth(),
                 ) {
                     Column(
-                        modifier = GlanceModifier.fillMaxHeight().defaultWeight(),
+                        modifier = GlanceModifier
+                            .fillMaxHeight()
+                            .defaultWeight(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -146,7 +138,7 @@ class FluidIntakeTrackerWidget : GlanceAppWidget() {
                         )
                         Spacer(modifier = GlanceModifier.size(8.dp))
                         Text(
-                            text = "Cél: ${dailyGoal}ml",
+                            text = "Cél: ${dailyGoal / 1000}l",
                             style = TextStyle(
                                 color = GlanceTheme.colors.onBackground,
                             )
@@ -173,12 +165,7 @@ class FluidIntakeTrackerWidget : GlanceAppWidget() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Image(
-                                    provider = IconImageProvider(
-                                        Icon.createWithResource(
-                                            LocalContext.current,
-                                            R.drawable.ic_refresh,
-                                        )
-                                    ),
+                                    provider = ImageProvider(R.drawable.ic_refresh),
                                     contentDescription = null,
                                 )
                             }
@@ -202,12 +189,7 @@ class FluidIntakeTrackerWidget : GlanceAppWidget() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Image(
-                                    provider = IconImageProvider(
-                                        Icon.createWithResource(
-                                            LocalContext.current,
-                                            R.drawable.ic_refresh,
-                                        )
-                                    ),
+                                    provider = ImageProvider(R.drawable.ic_refresh),
                                     contentDescription = null,
                                 )
                             }
@@ -235,12 +217,7 @@ class FluidIntakeTrackerWidget : GlanceAppWidget() {
         ) {
             Image(
                 modifier = GlanceModifier.size(16.dp),
-                provider = IconImageProvider(
-                    Icon.createWithResource(
-                        LocalContext.current,
-                        iconResource
-                    )
-                ),
+                provider = ImageProvider(iconResource),
                 contentDescription = null,
             )
             Text(

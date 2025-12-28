@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.csakitheone.wholesomeware"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 11
         versionName = "1.8"

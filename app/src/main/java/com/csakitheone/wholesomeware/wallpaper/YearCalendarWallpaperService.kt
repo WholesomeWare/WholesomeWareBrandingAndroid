@@ -1,5 +1,6 @@
 package com.csakitheone.wholesomeware.wallpaper
 
+import android.app.KeyguardManager
 import android.app.WallpaperColors
 import android.content.Intent
 import android.content.IntentFilter
@@ -22,6 +23,9 @@ import kotlin.math.min
 class YearCalendarWallpaperService : WallpaperService() {
     override fun onCreateEngine(): Engine {
         return object : Engine() {
+            private val keyguardManager by lazy {
+                getSystemService(KeyguardManager::class.java)
+            }
             private val handler = Handler(Looper.getMainLooper())
             private var visible = false
             private var width = 0
@@ -64,7 +68,7 @@ class YearCalendarWallpaperService : WallpaperService() {
                     updateCalendarData()
 
                     // Adjust framerate based on power saving mode
-                    val framerate = 1
+                    val framerate = 15
                     draw(1000L / framerate)
                     if (visible) {
                         handler.postDelayed(this, 1000L / framerate)
@@ -201,19 +205,21 @@ class YearCalendarWallpaperService : WallpaperService() {
                 val startY = padding + (availableHeight - gridHeight) / 2f
 
                 // Draw progress text
-                val progressPaint = Paint().apply {
-                    color = textColor.toColorInt()
-                    textSize = 32f
-                    isAntiAlias = true
-                    textAlign = Paint.Align.CENTER
+                if (keyguardManager.isKeyguardLocked) {
+                    val progressPaint = Paint().apply {
+                        color = textColor.toColorInt()
+                        textSize = 32f
+                        isAntiAlias = true
+                        textAlign = Paint.Align.CENTER
+                    }
+                    val progressPercentage = (currentDayOfYear * 100f / totalDaysInYear).toInt()
+                    canvas.drawText(
+                        "Day $currentDayOfYear of $totalDaysInYear ($progressPercentage%)",
+                        width / 2f,
+                        startY + gridHeight + 60f,
+                        progressPaint
+                    )
                 }
-                val progressPercentage = (currentDayOfYear * 100f / totalDaysInYear).toInt()
-                canvas.drawText(
-                    "Day $currentDayOfYear of $totalDaysInYear ($progressPercentage%)",
-                    width / 2f,
-                    startY + gridHeight + 60f,
-                    progressPaint
-                )
 
                 // Draw dots for each day
                 val completedPaint = completedColor.toPaint()

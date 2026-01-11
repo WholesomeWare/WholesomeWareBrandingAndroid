@@ -14,6 +14,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.service.wallpaper.WallpaperService
+import android.util.Log
 import android.view.SurfaceHolder
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toBitmap
@@ -48,7 +49,7 @@ class HelkaFreeFlightDiveWallpaperService : WallpaperService() {
                     else if (visualizer != null) 120
                     else 60
 
-                    if (visible && !powerManager.isPowerSaveMode && visualizer == null && visualizerRetryRate > framerate / 4) {
+                    if (visible && !powerManager.isPowerSaveMode && visualizer == null && visualizerRetryRate > framerate * 2) {
                         initializeVisualizer()
                         visualizerRetryRate = 0
                     }
@@ -80,7 +81,7 @@ class HelkaFreeFlightDiveWallpaperService : WallpaperService() {
                                 waveform: ByteArray?,
                                 samplingRate: Int
                             ) {
-                                visualizerData = (waveform ?: ByteArray(128) { 0 })
+                                visualizerData = (waveform ?: ByteArray(128))
                                         .take(128)
                                         .toByteArray()
                                 val isSilent =

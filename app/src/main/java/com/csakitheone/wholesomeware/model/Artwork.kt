@@ -16,6 +16,7 @@ import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveWallpaperServi
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.SkeletonSwingWallpaperService
+import com.csakitheone.wholesomeware.wallpaper.YearCalendarWallpaperService
 import com.csakitheone.wholesomeware.widget.DartsHelperWidget
 import com.csakitheone.wholesomeware.widget.DartsHelperWidgetReceiver
 import com.csakitheone.wholesomeware.widget.FluidIntakeTrackerWidget
@@ -122,6 +123,15 @@ fun getArtworks(context: Context): List<Artwork> {
             componentName = ComponentName(
                 context,
                 D20WallpaperService::class.java
+            ),
+        ),
+        WallpaperArtwork(
+            title = "Év naptár",
+            artist = ARTIST_CSAKI,
+            description = "Hol járunk az évben?",
+            componentName = ComponentName(
+                context,
+                YearCalendarWallpaperService::class.java
             ),
         ),
         WallpaperArtwork(

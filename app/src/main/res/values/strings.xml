@@ -19,6 +19,9 @@
     <string name="skeleton_swing_wallpaper_name">Hintázó csontváz by Csáki</string>
     <string name="skeleton_swing_wallpaper_description">Egy csontváz lassan hintázik a sötétben.</string>
 
+    <string name="year_calendar_wallpaper_name">Év naptár by Csáki</string>
+    <string name="year_calendar_wallpaper_description">Egy teljes év naptára pontokkal, amely mutatja az év haladását.</string>
+
     <string name="darts_helper_widget_description">Számítsd ki a legkevesebb dobás számát a nyeréshez dartsban.</string>
     <string name="fluid_intake_tracker_widget_description">Track your daily fluid intake and stay hydrated.</string>
     <string name="title_activity_radio_experiment">RadioExperimentActivity</string>

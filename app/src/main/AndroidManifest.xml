@@ -122,6 +122,20 @@
                 android:resource="@xml/skeleton_swing_wallpaper" />
         </service>
         <service
+            android:name=".wallpaper.WholesomeWarePortraitWallpaperService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/wholesomeware_portrait_wallpaper_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/wholesomeware_portrait_wallpaper" />
+        </service>
+        <service
             android:name=".wallpaper.YearCalendarWallpaperService"
             android:enabled="true"
             android:exported="true"

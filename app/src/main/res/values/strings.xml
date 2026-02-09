@@ -22,6 +22,9 @@
     <string name="year_calendar_wallpaper_name">Év naptár by Csáki</string>
     <string name="year_calendar_wallpaper_description">Egy teljes év naptára pontokkal, amely mutatja az év haladását.</string>
 
+    <string name="wholesomeware_portrait_wallpaper_name">WholesomeWare portré</string>
+    <string name="wholesomeware_portrait_wallpaper_description">A WholesomeWare branding portré illusztrációja.</string>
+
     <string name="darts_helper_widget_description">Számítsd ki a legkevesebb dobás számát a nyeréshez dartsban.</string>
     <string name="fluid_intake_tracker_widget_description">Track your daily fluid intake and stay hydrated.</string>
     <string name="title_activity_radio_experiment">RadioExperimentActivity</string>

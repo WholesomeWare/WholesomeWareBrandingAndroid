@@ -16,6 +16,7 @@ import com.csakitheone.wholesomeware.wallpaper.HelkaFreeFlightDiveWallpaperServi
 import com.csakitheone.wholesomeware.wallpaper.KoloraFesztAnalogClockWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.LighthouseWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.SkeletonSwingWallpaperService
+import com.csakitheone.wholesomeware.wallpaper.WholesomeWarePortraitWallpaperService
 import com.csakitheone.wholesomeware.wallpaper.YearCalendarWallpaperService
 import com.csakitheone.wholesomeware.widget.DartsHelperWidget
 import com.csakitheone.wholesomeware.widget.DartsHelperWidgetReceiver
@@ -182,6 +183,16 @@ fun getArtworks(context: Context): List<Artwork> {
             componentName = ComponentName(
                 context,
                 LighthouseWallpaperService::class.java
+            ),
+        ),
+        WallpaperArtwork(
+            title = "WholesomeWare portré",
+            artist = ARTIST_CSAKI,
+            description = "A WholesomeWare branding portré illusztrációja.",
+            tags = listOf("branding"),
+            componentName = ComponentName(
+                context,
+                WholesomeWarePortraitWallpaperService::class.java
             ),
         ),
 

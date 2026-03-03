@@ -47,12 +47,10 @@ class KoloraFesztAnalogClockWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override val glanceAppWidget: GlanceAppWidget = KoloraFesztAnalogClockWidget()
 
-    override fun onEnabled(context: Context?) {
-        super.onEnabled(context)
+    private fun startUpdateLoop(context: Context) {
+        if (isActive) return // Already running
+
         isActive = true
-
-        if (context == null) return
-
         GlobalScope.launch(Dispatchers.IO) {
             while (isActive) {
                 val ids =
@@ -66,7 +64,21 @@ class KoloraFesztAnalogClockWidgetReceiver : GlanceAppWidgetReceiver() {
                 delay(1000L)
             }
         }
+    }
 
+    override fun onEnabled(context: Context?) {
+        super.onEnabled(context)
+        if (context == null) return
+        startUpdateLoop(context)
+    }
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: android.appwidget.AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        startUpdateLoop(context)
     }
 
     override fun onDisabled(context: Context?) {

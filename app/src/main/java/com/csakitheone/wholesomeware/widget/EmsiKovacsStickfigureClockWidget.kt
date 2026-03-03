@@ -1,6 +1,7 @@
 package com.csakitheone.wholesomeware.widget
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
@@ -8,6 +9,7 @@ import android.graphics.PorterDuff
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.createBitmap
+import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
@@ -18,15 +20,13 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.appwidget.updateAll
-import androidx.glance.currentState
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.state.GlanceStateDefinition
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.glance.BackgroundModifier
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.background
+import androidx.glance.currentState
 import com.csakitheone.wholesomeware.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -40,12 +40,10 @@ class EmsiKovacsStickfigureClockWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override val glanceAppWidget: GlanceAppWidget = EmsiKovacsStickfigureClockWidget()
 
-    override fun onEnabled(context: Context?) {
-        super.onEnabled(context)
+    private fun startUpdateLoop(context: Context) {
+        if (isActive) return // Already running
+
         isActive = true
-
-        if (context == null) return
-
         GlobalScope.launch(Dispatchers.IO) {
             while (isActive) {
                 val ids =
@@ -56,9 +54,24 @@ class EmsiKovacsStickfigureClockWidgetReceiver : GlanceAppWidgetReceiver() {
                     }
                 }
                 glanceAppWidget.updateAll(context)
-                delay(1000L)
+                delay(10_000L)
             }
         }
+    }
+
+    override fun onEnabled(context: Context?) {
+        super.onEnabled(context)
+        if (context == null) return
+        startUpdateLoop(context)
+    }
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: android.appwidget.AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        startUpdateLoop(context)
     }
 
     override fun onDisabled(context: Context?) {
@@ -73,12 +86,51 @@ class EmsiKovacsStickfigureClockWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*>?
         get() = super.stateDefinition
 
+    private lateinit var baseBitmap: Bitmap
+    private lateinit var hourHandBitmap: Bitmap
+    private lateinit var minuteHandBitmap: Bitmap
+
     override suspend fun provideGlance(
         context: Context,
         id: GlanceId
     ) {
-        val bitmap = createBitmap(1080, 1080)
+        val bitmapSize = 512
+        val bitmap = createBitmap(bitmapSize, bitmapSize)
         val canvas = Canvas(bitmap)
+
+        baseBitmap = ResourcesCompat.getDrawable(
+            context.resources,
+            R.drawable.emsi_kovacs_stickfigure_legless,
+            null
+        )?.let { drawable ->
+            val bmp = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
+            val tempCanvas = Canvas(bmp)
+            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+            drawable.draw(tempCanvas)
+            bmp
+        } ?: createBitmap(bitmapSize, bitmapSize)
+        hourHandBitmap = ResourcesCompat.getDrawable(
+            context.resources,
+            R.drawable.emsi_kovacs_stickfigure_handle_hour,
+            null
+        )?.let { drawable ->
+            val bmp = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
+            val tempCanvas = Canvas(bmp)
+            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+            drawable.draw(tempCanvas)
+            bmp
+        } ?: createBitmap(bitmapSize, bitmapSize)
+        minuteHandBitmap = ResourcesCompat.getDrawable(
+            context.resources,
+            R.drawable.emsi_kovacs_stickfigure_handle_minute,
+            null
+        )?.let { drawable ->
+            val bmp = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
+            val tempCanvas = Canvas(bmp)
+            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+            drawable.draw(tempCanvas)
+            bmp
+        } ?: createBitmap(bitmapSize, bitmapSize)
 
         provideContent {
             val now = currentState<Preferences>()[longPreferencesKey("now")]
@@ -113,47 +165,8 @@ class EmsiKovacsStickfigureClockWidget : GlanceAppWidget() {
         // Clear canvas
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR)
 
-        // Load the stick figure base image
-        val baseBitmap = ResourcesCompat.getDrawable(
-            context.resources,
-            R.drawable.emsi_kovacs_stickfigure_legless,
-            null
-        )?.let { drawable ->
-            val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
-            val tempCanvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-            drawable.draw(tempCanvas)
-            bitmap
-        }
-
-        // Load the hour hand image
-        val hourHandBitmap = ResourcesCompat.getDrawable(
-            context.resources,
-            R.drawable.emsi_kovacs_stickfigure_handle_hour,
-            null
-        )?.let { drawable ->
-            val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
-            val tempCanvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-            drawable.draw(tempCanvas)
-            bitmap
-        }
-
-        // Load the minute hand image
-        val minuteHandBitmap = ResourcesCompat.getDrawable(
-            context.resources,
-            R.drawable.emsi_kovacs_stickfigure_handle_minute,
-            null
-        )?.let { drawable ->
-            val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
-            val tempCanvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-            drawable.draw(tempCanvas)
-            bitmap
-        }
-
         // Draw the base stick figure
-        baseBitmap?.let { base ->
+        baseBitmap.let { base ->
             val scale = min(canvas.width, canvas.height).toFloat() / min(base.width, base.height)
             val scaledWidth = base.width * scale
             val scaledHeight = base.height * scale
@@ -169,7 +182,7 @@ class EmsiKovacsStickfigureClockWidget : GlanceAppWidget() {
         }
 
         // Draw the hour hand (rotated)
-        hourHandBitmap?.let { hand ->
+        hourHandBitmap.let { hand ->
             val scale = min(canvas.width, canvas.height).toFloat() / min(
                 baseBitmap?.width ?: 1080,
                 baseBitmap?.height ?: 1080
@@ -185,7 +198,7 @@ class EmsiKovacsStickfigureClockWidget : GlanceAppWidget() {
         }
 
         // Draw the minute hand (rotated)
-        minuteHandBitmap?.let { hand ->
+        minuteHandBitmap.let { hand ->
             val scale = min(canvas.width, canvas.height).toFloat() / min(
                 baseBitmap?.width ?: 1080,
                 baseBitmap?.height ?: 1080

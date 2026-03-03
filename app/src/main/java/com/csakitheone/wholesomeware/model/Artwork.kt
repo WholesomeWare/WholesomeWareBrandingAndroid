@@ -20,6 +20,8 @@ import com.csakitheone.wholesomeware.wallpaper.WholesomeWarePortraitWallpaperSer
 import com.csakitheone.wholesomeware.wallpaper.YearCalendarWallpaperService
 import com.csakitheone.wholesomeware.widget.DartsHelperWidget
 import com.csakitheone.wholesomeware.widget.DartsHelperWidgetReceiver
+import com.csakitheone.wholesomeware.widget.EmsiKovacsStickfigureClockWidget
+import com.csakitheone.wholesomeware.widget.EmsiKovacsStickfigureClockWidgetReceiver
 import com.csakitheone.wholesomeware.widget.FluidIntakeTrackerWidget
 import com.csakitheone.wholesomeware.widget.FluidIntakeTrackerWidgetReceiver
 import com.csakitheone.wholesomeware.widget.KoloraFesztAnalogClockWidget
@@ -219,6 +221,13 @@ fun getArtworks(context: Context): List<Artwork> {
             tags = listOf("kolora"),
             receiver = KoloraFesztAnalogClockWidgetReceiver::class.java,
             widget = KoloraFesztAnalogClockWidget(),
+        ),
+        WidgetArtwork(
+            title = "Pálcikaember óra",
+            artist = ARTIST_EMSI_KOVACS,
+            description = "Analóg óra pálcikaember grafikával.",
+            receiver = EmsiKovacsStickfigureClockWidgetReceiver::class.java,
+            widget = EmsiKovacsStickfigureClockWidget(),
         ),
     )
 }

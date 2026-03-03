@@ -29,6 +29,15 @@ val ARTIST_M_LIA = Artist(
     name = "M. Lia",
 )
 
+val ARTIST_EMSI_KOVACS = Artist(
+    name = "Kovács Emese",
+    socials = mapOf(
+        "Instagram" to "https://www.instagram.com/emsi_kovacs/",
+        "TikTok" to "https://www.tiktok.com/@emese.kovcs76",
+        "YouTube" to "https://www.youtube.com/@emesekovacs4007",
+    ),
+)
+
 val ARTIST_UNKNOWN = Artist(
     name = "Ismeretlen",
 )

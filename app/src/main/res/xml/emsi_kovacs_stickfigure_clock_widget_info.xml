@@ -1,0 +1,13 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:description="@string/emsi_kovacs_stickfigure_clock_widget_description"
+    android:previewImage="@drawable/emsi_kovacs_stickfigure"
+    android:maxResizeWidth="350dp"
+    android:maxResizeHeight="320dp"
+    android:minWidth="40dp"
+    android:minHeight="40dp"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:widgetCategory="home_screen" />
+

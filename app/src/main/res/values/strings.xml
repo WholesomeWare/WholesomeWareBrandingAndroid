@@ -31,4 +31,6 @@
     <string name="darts_helper_widget_description">Számítsd ki a legkevesebb dobás számát a nyeréshez dartsban.</string>
     <string name="fluid_intake_tracker_widget_description">Track your daily fluid intake and stay hydrated.</string>
     <string name="title_activity_radio_experiment">RadioExperimentActivity</string>
+    <string name="title_activity_chaos_to_calendar_experiment">ChaosToCalendarExperimentActivity
+    </string>
 </resources>

@@ -100,6 +100,7 @@ import com.csakitheone.wholesomeware.ui.components.Menu
 import com.csakitheone.wholesomeware.ui.components.MenuScope
 import com.csakitheone.wholesomeware_brand.ui.theme.WholesomewareBrandTheme
 import androidx.core.net.toUri
+import com.csakitheone.wholesomeware.experiment.ChaosToCalendarExperimentActivity
 import com.csakitheone.wholesomeware.experiment.DartsHelper
 import com.csakitheone.wholesomeware.experiment.NetworkUtils
 import com.csakitheone.wholesomeware.experiment.RadioExperimentActivity
@@ -768,6 +769,15 @@ class MainActivity : ComponentActivity() {
             }
             title("Kísérletek")
             items(
+                MenuScope.ItemInfo(
+                    onClick = {
+                        startActivity(
+                            Intent(context, ChaosToCalendarExperimentActivity::class.java)
+                        )
+                    },
+                    title = "Káoszból naptárba",
+                    description = "Írj be egy szabad szöveget és a mesterséges intelligencia megpróbálja értelmezni, hogy milyen naptári eseményeket lehetne létrehozni belőle.",
+                ),
                 MenuScope.ItemInfo(
                     onClick = {
                         startActivity(

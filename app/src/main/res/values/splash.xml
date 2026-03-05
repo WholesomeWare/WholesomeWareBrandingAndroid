@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="SplashScreen" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.WholesomeWare</item>
-        <item name="android:windowSplashScreenBrandingImage">@drawable/ww_logo_with_text</item>
+        <item name="android:windowSplashScreenBrandingImage" tools:ignore="NewApi">@drawable/ww_logo_with_text</item>
     </style>
 </resources>

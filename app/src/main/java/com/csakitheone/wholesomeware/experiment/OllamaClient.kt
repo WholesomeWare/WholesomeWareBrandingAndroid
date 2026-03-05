@@ -14,6 +14,7 @@ class OllamaClient {
 
         private val okhttp = OkHttpClient.Builder()
             .callTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .build()
         private val homeNetworkHost = "80.99.231.215"
         private val myDeviceHost = "192.168.0.100"

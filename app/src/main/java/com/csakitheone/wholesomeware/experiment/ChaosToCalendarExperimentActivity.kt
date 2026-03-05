@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,11 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -48,7 +53,7 @@ class ChaosToCalendarExperimentActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
     @Preview
     @Composable
     fun ChaosToCalendarExperimentScreen() {
@@ -85,8 +90,11 @@ class ChaosToCalendarExperimentActivity : ComponentActivity() {
                         },
                     )
                     Column(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
                     ) {
+                        AnimatedVisibility(isAiThinking) {
+                            LoadingIndicator()
+                        }
                         AnimatedContent(targetState = aiReply) {
                             Text(
                                 modifier = Modifier.padding(16.dp),
@@ -107,6 +115,7 @@ class ChaosToCalendarExperimentActivity : ComponentActivity() {
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             OutlinedTextField(
+                                enabled = !isAiThinking,
                                 modifier = Modifier.fillMaxWidth(),
                                 value = rawInput,
                                 onValueChange = { rawInput = it },
@@ -115,6 +124,7 @@ class ChaosToCalendarExperimentActivity : ComponentActivity() {
                                 maxLines = 10,
                             )
                             Button(
+                                enabled = rawInput.isNotBlank() && !isAiThinking,
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
                                     isAiThinking = true

@@ -1,13 +1,14 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("maven-publish")
 }
 
 android {
     namespace = "com.csakitheone.wholesomeware_brand"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -31,17 +32,23 @@ android {
     buildFeatures {
         compose = true
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    publishing {
+        singleVariant("release")
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
     }
 }
 

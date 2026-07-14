@@ -15,8 +15,8 @@ android {
         applicationId = "com.csakitheone.wholesomeware"
         minSdk = 26
         targetSdk = 37
-        versionCode = 12
-        versionName = "1.9"
+        versionCode = 13
+        versionName = "1.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

@@ -1,10 +1,12 @@
-package com.csakitheone.wholesomeware.model
+package com.csakitheone.wholesomeware.data.model
 
+import android.Manifest
 import android.app.Activity
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.glance.appwidget.GlanceAppWidget
@@ -57,7 +59,7 @@ data class WallpaperArtwork(
             ContextCompat.checkSelfPermission(
                 activity,
                 it
-            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) != PackageManager.PERMISSION_GRANTED
         }
 
         if (missingPermissions.isNotEmpty()) {
@@ -100,7 +102,7 @@ data class WidgetArtwork<T : GlanceAppWidgetReceiver>(
             ContextCompat.checkSelfPermission(
                 activity,
                 it
-            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) != PackageManager.PERMISSION_GRANTED
         }
 
         if (missingPermissions.isNotEmpty()) {
@@ -168,8 +170,8 @@ fun getArtworks(context: Context): List<Artwork> {
             unlockData = "https://www.helkamusic.hu/",
             tags = listOf("rajz", "zene"),
             permissions = listOf(
-                android.Manifest.permission.RECORD_AUDIO,
-                android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.MODIFY_AUDIO_SETTINGS,
             ),
             componentName = ComponentName(
                 context,

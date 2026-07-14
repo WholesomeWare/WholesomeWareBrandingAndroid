@@ -2,7 +2,6 @@ package com.csakitheone.wholesomeware.ui.screens
 
 import android.content.Intent
 import androidx.activity.compose.LocalActivity
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -68,18 +67,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.csakitheone.wholesomeware.R
 import com.csakitheone.wholesomeware.UserSettings
-import com.csakitheone.wholesomeware.model.Artwork
-import com.csakitheone.wholesomeware.model.WallpaperArtwork
-import com.csakitheone.wholesomeware.model.WidgetArtwork
-import com.csakitheone.wholesomeware.model.getArtworks
+import com.csakitheone.wholesomeware.data.model.Artwork
+import com.csakitheone.wholesomeware.data.model.WallpaperArtwork
+import com.csakitheone.wholesomeware.data.model.WidgetArtwork
+import com.csakitheone.wholesomeware.data.model.getArtworks
 import com.csakitheone.wholesomeware.ui.components.Menu
 import com.csakitheone.wholesomeware.ui.components.MenuScope
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
+import com.csakitheone.wholesomeware.ui.navigation.InkognitoFeszt
 import com.csakitheone.wholesomeware.ui.navigation.Navigator
 import com.csakitheone.wholesomeware.ui.navigation.RadioExperiment
 import com.csakitheone.wholesomeware_brand.WholesomeWare
@@ -295,6 +294,7 @@ fun MainScreen(
                     when (it) {
                         TAB_HOME -> TabHome(
                             modifier = Modifier.verticalScroll(menuScrollState),
+                            navigator = navigator,
                             onTabChangeRequest = { tab -> selectedTab = tab }
                         )
 
@@ -304,7 +304,7 @@ fun MainScreen(
 
                         TAB_EXPERIMENTS -> TabExperiments(
                             modifier = Modifier.verticalScroll(menuScrollState),
-                            navigator = navigator
+                            navigator = navigator,
                         )
                     }
                 }
@@ -359,6 +359,7 @@ fun MainScreen(
 @Composable
 private fun TabHome(
     modifier: Modifier = Modifier,
+    navigator: Navigator,
     onTabChangeRequest: (String) -> Unit = { _ -> },
 ) {
     val context = LocalContext.current
@@ -375,6 +376,19 @@ private fun TabHome(
         }
         WWMenuDefaults.sectionSpacer()
         items(
+            MenuScope.ItemInfo(
+                onClick = {
+                    navigator.navigate(InkognitoFeszt)
+                },
+                title = "INKognito Fesztivál programfüzet",
+                description = "Júli 17-19.",
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_access_time),
+                        contentDescription = null,
+                    )
+                },
+            ),
             MenuScope.ItemInfo(
                 onClick = { onTabChangeRequest(TAB_ARTWORKS) },
                 title = "Alkotások",
@@ -702,7 +716,7 @@ private fun TabArtworks(
 @Composable
 private fun TabExperiments(
     modifier: Modifier = Modifier,
-    navigator: Navigator
+    navigator: Navigator,
 ) {
     Menu(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
         ElevatedCard(

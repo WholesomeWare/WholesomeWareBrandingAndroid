@@ -17,11 +17,13 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.csakitheone.wholesomeware.service.RadioService
+import com.csakitheone.wholesomeware.ui.navigation.InkognitoFeszt
 import com.csakitheone.wholesomeware.ui.navigation.Main
 import com.csakitheone.wholesomeware.ui.navigation.Navigator
 import com.csakitheone.wholesomeware.ui.navigation.RadioExperiment
 import com.csakitheone.wholesomeware.ui.navigation.rememberNavigationState
 import com.csakitheone.wholesomeware.ui.navigation.toEntries
+import com.csakitheone.wholesomeware.ui.screens.InkognitoFesztScreen
 import com.csakitheone.wholesomeware.ui.screens.MainScreen
 import com.csakitheone.wholesomeware.ui.screens.RadioExperimentScreen
 
@@ -60,6 +62,9 @@ class MainActivity : ComponentActivity() {
                 }
                 entry<RadioExperiment> {
                     RadioExperimentScreen(navigator = navigator, radioService = radioService)
+                }
+                entry<InkognitoFeszt> {
+                    InkognitoFesztScreen(navigator = navigator)
                 }
             }
 

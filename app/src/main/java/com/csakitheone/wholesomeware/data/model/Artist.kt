@@ -1,4 +1,4 @@
-package com.csakitheone.wholesomeware.model
+package com.csakitheone.wholesomeware.data.model
 
 data class Artist(
     val name: String,

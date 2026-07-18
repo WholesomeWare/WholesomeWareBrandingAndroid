@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -45,6 +46,7 @@ import com.csakitheone.wholesomeware.data.InkognitoFesztRepository
 import com.csakitheone.wholesomeware.ui.navigation.Navigator
 import com.csakitheone.wholesomeware.ui.theme.InkognitoTheme
 import kotlinx.coroutines.delay
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -56,9 +58,17 @@ fun InkognitoFesztScreen(
     navigator: Navigator
 ) {
     val context = LocalContext.current
-    var selectedDay by remember { mutableIntStateOf(17) }
-    val events = remember(selectedDay) {
-        InkognitoFesztRepository.programs.filter { it.startTime.dayOfMonth == selectedDay }
+    var selectedDay by remember {
+        val dayOfMonth = LocalDate.now().dayOfMonth
+        mutableIntStateOf(
+            if ((17..19).contains(dayOfMonth)) dayOfMonth else 17
+        )
+    }
+    var selectedStage by remember { mutableStateOf("") }
+    val events = remember(selectedDay, selectedStage) {
+        InkognitoFesztRepository.programs
+            .filter { it.startTime.dayOfMonth == selectedDay }
+            .filter { selectedStage.isBlank() || it.stage == selectedStage }
     }
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -155,6 +165,27 @@ fun InkognitoFesztScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    item {
+                        Row {
+                            FilterChip(
+                                selected = selectedStage == "Belső színpad",
+                                onClick = {
+                                    selectedStage =
+                                        if (selectedStage == "Belső színpad") "" else "Belső színpad"
+                                },
+                                label = { Text("Belső színpad") },
+                            )
+                            FilterChip(
+                                selected = selectedStage == "Külső színpad",
+                                onClick = {
+                                    selectedStage =
+                                        if (selectedStage == "Külső színpad") "" else "Külső színpad"
+                                },
+                                label = { Text("Külső színpad") },
+                            )
+                        }
+                    }
+
                     items(events, { it.title }) { event ->
                         val progress by remember(now, event.startTime, event.endTime) {
                             derivedStateOf {

@@ -394,9 +394,13 @@ private fun TabHome(
                     )
                 },
             ),
+        )
+        title("Brand-ek")
+        items(
             MenuScope.ItemInfo(
                 onClick = { activity?.let { WholesomeWare.openPlayStore(it) } },
-                title = "Mégtöbb app tőlünk",
+                title = "WholesomeWare",
+                description = "Kopp ide a többi appunkért",
                 leadingIcon = {
                     Icon(
                         painter = painterResource(com.csakitheone.wholesomeware_brand.R.drawable.ic_wholesomeware),
@@ -420,7 +424,7 @@ private fun TabHome(
                         )
                     )
                 },
-                title = "Kolora Egyesület",
+                title = "Kolora",
                 description = "A WW nem hivatalos szülő szervezete",
                 leadingIcon = {
                     Icon(
@@ -436,7 +440,32 @@ private fun TabHome(
                     )
                 },
                 backgroundImage = painterResource(R.drawable.kolora_banner),
-            )
+            ),
+            MenuScope.ItemInfo(
+                onClick = {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            "https://www.instagram.com/inkognito_kollektiva/".toUri()
+                        )
+                    )
+                },
+                title = "INKognitó Kolléktíva",
+                description = "HSzT-s művész barátok",
+                leadingIcon = {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(id = R.drawable.ic_inkognito),
+                        contentDescription = null,
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_open_in_new),
+                        contentDescription = null
+                    )
+                },
+            ),
         )
     }
 }

@@ -8,6 +8,3 @@ data object Main : NavKey
 
 @Serializable
 data object RadioExperiment : NavKey
-
-@Serializable
-data object InkognitoFeszt : NavKey

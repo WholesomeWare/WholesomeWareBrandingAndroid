@@ -78,7 +78,6 @@ import com.csakitheone.wholesomeware.data.model.getArtworks
 import com.csakitheone.wholesomeware.ui.components.Menu
 import com.csakitheone.wholesomeware.ui.components.MenuScope
 import com.csakitheone.wholesomeware.ui.components.WWMenuDefaults
-import com.csakitheone.wholesomeware.ui.navigation.InkognitoFeszt
 import com.csakitheone.wholesomeware.ui.navigation.Navigator
 import com.csakitheone.wholesomeware.ui.navigation.RadioExperiment
 import com.csakitheone.wholesomeware_brand.WholesomeWare
@@ -294,7 +293,6 @@ fun MainScreen(
                     when (it) {
                         TAB_HOME -> TabHome(
                             modifier = Modifier.verticalScroll(menuScrollState),
-                            navigator = navigator,
                             onTabChangeRequest = { tab -> selectedTab = tab }
                         )
 
@@ -359,7 +357,6 @@ fun MainScreen(
 @Composable
 private fun TabHome(
     modifier: Modifier = Modifier,
-    navigator: Navigator,
     onTabChangeRequest: (String) -> Unit = { _ -> },
 ) {
     val context = LocalContext.current
@@ -376,19 +373,6 @@ private fun TabHome(
         }
         WWMenuDefaults.sectionSpacer()
         items(
-            MenuScope.ItemInfo(
-                onClick = {
-                    navigator.navigate(InkognitoFeszt)
-                },
-                title = "INKognito Fesztivál programfüzet",
-                description = "Júli 17-19.",
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_access_time),
-                        contentDescription = null,
-                    )
-                },
-            ),
             MenuScope.ItemInfo(
                 onClick = { onTabChangeRequest(TAB_ARTWORKS) },
                 title = "Alkotások",
